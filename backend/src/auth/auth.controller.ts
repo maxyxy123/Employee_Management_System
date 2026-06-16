@@ -1,4 +1,4 @@
-import { Controller, Req } from '@nestjs/common';
+import { Controller, Get, Req } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Post, Body, Res } from '@nestjs/common';
 import { LoginDto, RegisterDto } from 'src/dto/auth.dto';
@@ -29,5 +29,11 @@ export class AuthController {
   refresh(@Res() res: Response, @Req() req: Request) {
     const refresh_Token = req.cookies.refresh_Token as string;
     return this.authService.refresh(res, refresh_Token);
+  }
+
+  @Get('me')
+  getUser(@Req() req: Request) {
+    const refresh_Token = req.cookies.refresh_Token as string;
+    return this.authService.getUser(req, refresh_Token);
   }
 }

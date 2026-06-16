@@ -1,5 +1,6 @@
 import {
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -8,7 +9,7 @@ import { PrismaService } from 'prisma/prisma.service';
 import { LoginDto, RegisterDto } from 'src/dto/auth.dto';
 import { JwtService } from '@nestjs/jwt';
 import bcrypt from 'bcrypt';
-import type { Response } from 'express';
+import type { Request, Response } from 'express';
 @Injectable()
 export class AuthService {
   constructor(
@@ -51,6 +52,8 @@ export class AuthService {
     });
     if (!user) throw new NotFoundException('User not found');
 
+    if (user.status !== 'ACTIVE')
+      throw new ConflictException('User is not ACTIVE');
     const isPasswordValid = await bcrypt.compare(
       loginInput.password,
       user.password,
@@ -289,5 +292,65 @@ export class AuthService {
     return res.json({
       message: 'Successfully refreshed tokens',
     });
+  }
+
+  async getUser(req: Request, refresh_Token: string) {
+    if (!refresh_Token) {
+      throw new UnauthorizedException('Refresh token not found');
+    }
+
+    let payload: { sub: string; role: string[]; jti: string };
+
+    try {
+      payload = await this.jwt.verifyAsync(refresh_Token, {
+        secret: process.env.REFRESH_TOKEN,
+      });
+    } catch (error) {
+      console.log(error);
+      throw new UnauthorizedException('Invalid or expired refresh token');
+    }
+
+    const savedToken = await this.prisma.refreshToken.findUnique({
+      where: { id: payload.jti },
+    });
+
+    if (!savedToken) {
+      throw new UnauthorizedException('Refresh token revoked');
+    }
+
+    const isTokenMatch = await bcrypt.compare(refresh_Token, savedToken.token);
+
+    if (!isTokenMatch) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+
+    if (savedToken.expiresAt < new Date()) {
+      throw new UnauthorizedException('Refresh token expired');
+    }
+
+    const user = await this.prisma.user.findUnique({
+      where: { id: payload.sub },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        status: true,
+        createdAt: true,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    if (user.status !== 'ACTIVE') {
+      throw new ForbiddenException('Account is inactive');
+    }
+
+    return {
+      message: 'Successfully found user',
+      data: user,
+    };
   }
 }
