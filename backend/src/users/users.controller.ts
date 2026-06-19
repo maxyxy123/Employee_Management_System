@@ -1,6 +1,10 @@
 import { Body, Controller, Get, Param, Put } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { UpdatePasswordDto, UpdateRoleDto, UpdateStatusDto } from 'src/dto/user.dto';
+import {
+  UpdatePasswordDto,
+  UpdateRoleDto,
+  UpdateStatusDto,
+} from 'src/dto/user.dto';
 
 @Controller('users')
 export class UsersController {

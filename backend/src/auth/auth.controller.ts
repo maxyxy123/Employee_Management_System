@@ -1,20 +1,14 @@
 import { Controller, Get, Req } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Post, Body, Res } from '@nestjs/common';
-import { LoginDto, RegisterDto } from 'src/dto/auth.dto';
+import { LoginDto } from 'src/dto/auth.dto';
 import type { Request, Response } from 'express';
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post('register')
-  login(@Body() registerInput: RegisterDto) {
-    console.log(process.env.DATABASE_URL);
-    return this.authService.register(registerInput);
-  }
-
   @Post('login')
-  register(@Body() loginInput: LoginDto, @Res() res) {
+  login(@Body() loginInput: LoginDto, @Res() res) {
     return this.authService.login(loginInput, res);
   }
 
