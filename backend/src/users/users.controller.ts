@@ -5,7 +5,10 @@ import {
   UpdateRoleDto,
   UpdateStatusDto,
 } from 'src/dto/user.dto';
+import { Roles } from 'src/decorators/role.decorator';
+import { Role } from 'src/enum/role.enum';
 
+@Roles(Role.Admin)
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -13,7 +16,7 @@ export class UsersController {
   @Get()
   getAllUser() {
     return this.usersService.getAllUser();
-  }
+  } 
 
   @Get(':id')
   getOneUser(@Param('id') id: string) {

@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { EmployeesService } from './employees.service';
 import { EmployeesDto, UpdateEmployeeDto } from 'src/dto/employee.dto';
+import type { Request } from 'express';
 
 @Controller('employees')
 export class EmployeesController {
