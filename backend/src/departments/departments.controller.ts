@@ -9,8 +9,11 @@ import {
 } from '@nestjs/common';
 import { DepartmentsService } from './departments.service';
 import { DepartmentDto, UpdateDepartmentDto } from 'src/dto/departments.dto';
+import { Roles } from 'src/decorators/role.decorator';
+import { Role } from 'src/enum/role.enum';
 
 @Controller('departments')
+@Roles(Role.Admin)
 export class DepartmentsController {
   constructor(private readonly departmentsService: DepartmentsService) {}
 
