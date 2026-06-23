@@ -33,13 +33,11 @@ export class DashboardService {
     ]);
 
     return {
-      message: 'Successfully get Dashboard Admin',
-      data: {
-        admin: {
-          name: admin?.name,
-          role: admin?.role,
-        },
+      admin: {
+        name: admin?.name,
+        role: admin?.role,
       },
+
       stats: {
         totalEmployees: totalEmployees,
         totalDepartments: totalDepartments,
@@ -89,20 +87,17 @@ export class DashboardService {
       ]);
 
     return {
-      message: 'Successfully get employee dashboard',
-      data: {
-        profile: {
-          id: employee.id,
-          employeeCode: employee.employeeCode,
-          name: employee.user.name,
-          email: employee.user.email,
-          phone: employee.phone,
-          position: employee.position,
-          department: employee.department?.name || null,
-          joinDate: employee.joinDate,
-          avatar: employee.avatar,
-          status: user.status,
-        },
+      profile: {
+        id: employee.id,
+        employeeCode: employee.employeeCode,
+        name: employee.user.name,
+        email: employee.user.email,
+        phone: employee.phone,
+        position: employee.position,
+        department: employee.department?.name || null,
+        joinDate: employee.joinDate,
+        avatar: employee.avatar,
+        status: user.status,
       },
       stats: {
         totalLeaves: totalLeaves,
