@@ -30,6 +30,12 @@ export class LeavesController {
     return this.leavesService.getOneLeave(id, req.user);
   }
 
+  @Get('me')
+  @Roles(Role.EMPLOYEE)
+  getMyLeaves(@Req() req) {
+    return this.leavesService.getMyLeaves(req.user.sub);
+  }
+
   @Post()
   @Roles(Role.EMPLOYEE)
   createLeave(@Body() leaveInput: createLeavesDto, @Req() req) {

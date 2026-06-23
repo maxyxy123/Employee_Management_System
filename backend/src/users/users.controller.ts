@@ -16,7 +16,7 @@ export class UsersController {
   @Get()
   getAllUser() {
     return this.usersService.getAllUser();
-  } 
+  }
 
   @Get(':id')
   getOneUser(@Param('id') id: string) {
