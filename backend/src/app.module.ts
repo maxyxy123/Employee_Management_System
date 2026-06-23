@@ -10,6 +10,7 @@ import { AuthGuard } from './guards/auth.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
 import { RolesGuard } from './guards/roles.guard';
+import { DashboardModule } from './dashboard/dashboard.module';
 @Module({
   imports: [
     AuthModule,
@@ -23,6 +24,7 @@ import { RolesGuard } from './guards/roles.guard';
         expiresIn: '7d',
       },
     }),
+    DashboardModule,
   ],
   controllers: [AppController],
   providers: [
