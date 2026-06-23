@@ -5,7 +5,6 @@ import { LoginDto } from 'src/dto/auth.dto';
 import type { Request, Response } from 'express';
 import { Public } from 'src/decorators/public.decorator';
 
-
 @Public()
 @Controller('auth')
 export class AuthController {
@@ -32,10 +31,25 @@ export class AuthController {
   }
 
   @Post('logout')
-  logout(@Res() res: Response, @Req() req: Request) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+  async logout(@Res() res: Response, @Req() req: Request) {
     const refresh_Token = req.cookies.refresh_Token as string;
-    return this.authService.logout(res, refresh_Token);
+    await this.authService.logout(refresh_Token);
+    res.clearCookie('access_Token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+    });
+
+    res.clearCookie('refresh_Token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+    });
+    return res.status(200).json({
+      message: 'Logout successfully',
+    });
   }
 
   @Post('refresh')

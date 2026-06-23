@@ -24,7 +24,12 @@ describe('AuthService', () => {
   };
 
   // mock AuthService
-  
+  const mockAuthService = {
+    login: jest.fn(),
+    logout: jest.fn(),
+    refresh: jest.fn(),
+    getUser: jest.fn(),
+  };
 
   //mock Service
   const mockPrismaService = {
