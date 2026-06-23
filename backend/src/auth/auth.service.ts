@@ -67,44 +67,42 @@ export class AuthService {
     };
   }
 
-  async logout(res: Response, refershToken: string) {
-    if (refershToken) {
-      try {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        const payload: {
-          sub: string;
-          role: string[];
-          jti: string;
-        } = await this.jwt.verifyAsync(refershToken, {
-          secret: process.env.REFRESH_TOKEN as string,
-        });
-
-        await this.prisma.refreshToken.deleteMany({
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-          where: { id: payload.jti },
-        });
-      } catch (error: any) {
-        console.log(error);
-      }
+  async logout(refreshToken: string) {
+    if (!refreshToken) {
+      return;
     }
 
-    res.clearCookie('access_Token', {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      path: '/',
-    });
+    try {
+      const payload: {
+        sub: string;
+        role: string;
+        jti: string;
+      } = await this.jwt.verifyAsync(refreshToken, {
+        secret: process.env.REFRESH_TOKEN as string,
+      });
 
-    res.clearCookie('refresh_Token', {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      path: '/',
-    });
+      await this.prisma.refreshToken.deleteMany({
+        where: { id: payload.jti },
+      });
 
-    return res.status(200).json({
-      message: 'Logout successfully',
-    });
+      return;
+    } catch {
+      return;
+    }
+
+    // res.clearCookie('access_Token', {
+    //   httpOnly: true,
+    //   secure: process.env.NODE_ENV === 'production',
+    //   sameSite: 'lax',
+    //   path: '/',
+    // });
+
+    // res.clearCookie('refresh_Token', {
+    //   httpOnly: true,
+    //   secure: process.env.NODE_ENV === 'production',
+    //   sameSite: 'lax',
+    //   path: '/',
+    // });
   }
 
   //Refresh token cũ hợp lệ →
