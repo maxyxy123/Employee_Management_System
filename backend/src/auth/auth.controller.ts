@@ -53,14 +53,39 @@ export class AuthController {
   }
 
   @Post('refresh')
-  refresh(@Res() res: Response, @Req() req: Request) {
+  async refresh(@Res() res: Response, @Req() req: Request) {
     const refresh_Token = req.cookies.refresh_Token as string;
-    return this.authService.refresh(res, refresh_Token);
+    const data = await this.authService.refresh(refresh_Token);
+
+    res.cookie('access_Token', data.access_Token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 15 * 60 * 1000,
+      path: '/',
+    });
+
+    res.cookie('refresh_Token', data.refresh_Token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: '/',
+    });
+
+    return res.json({
+      message: 'Successfully refreshed tokens',
+    });
   }
 
   @Get('me')
-  getUser(@Req() req: Request) {
-    const refresh_Token = req.cookies.refresh_Token as string;
-    return this.authService.getUser(req, refresh_Token);
+  async getUser(@Req() req: Request) {
+    const access_Token = req.cookies.access_Token as string;
+    const data = await this.authService.getUser(access_Token);
+
+    return {
+      message: data.message,
+      data: data.user,
+    };
   }
 }

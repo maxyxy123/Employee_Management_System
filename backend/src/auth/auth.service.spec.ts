@@ -6,64 +6,13 @@ import { Response } from 'express';
 import bcrypt from 'bcrypt';
 describe('AuthService', () => {
   let service: AuthService;
-  let prismaService: PrismaService;
-  let jwtService: JwtService;
-
-  //mock userData
-  const loginInput = {
-    email: 'test1@gmail.com',
-    password: 'test123',
-  };
-
-  const mockUser = {
-    id: 'e1238123-2312313',
-    name: 'Hoang minh',
-    email: 'test1@gmail.com',
-    password: 'hashPassword',
-    role: ['EMPLOYEE'],
-  };
-
-  // mock AuthService
-  const mockAuthService = {
-    login: jest.fn(),
-    logout: jest.fn(),
-    refresh: jest.fn(),
-    getUser: jest.fn(),
-  };
-
-  //mock Service
-  const mockPrismaService = {
-    user: {
-      findUnique: jest.fn(),
-      create: jest.fn(),
-    },
-    refreshToken: {
-      create: jest.fn(),
-    },
-  };
-
-  const mockJwtService = {
-    signAsync: jest.fn(),
-  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        AuthService,
-        {
-          provide: PrismaService,
-          useValue: mockPrismaService,
-        },
-        {
-          provide: JwtService,
-          useValue: mockJwtService,
-        },
-      ],
+      providers: [AuthService],
     }).compile();
 
     service = module.get<AuthService>(AuthService);
-    prismaService = module.get<PrismaService>(PrismaService);
-    jwtService = module.get<JwtService>(JwtService);
   });
 
   it('should be defined', () => {
