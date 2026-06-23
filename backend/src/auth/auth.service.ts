@@ -17,55 +17,34 @@ export class AuthService {
     private readonly jwt: JwtService,
   ) {}
 
-  async login(loginInput: LoginDto, res: Response) {
+  async login(loginInput: LoginDto) {
     const user = await this.prisma.user.findUnique({
       where: { email: loginInput.email },
     });
     if (!user) throw new NotFoundException('User not found');
-
     if (user.status !== 'ACTIVE')
       throw new ConflictException('User is not ACTIVE');
     const isPasswordValid = await bcrypt.compare(
       loginInput.password,
       user.password,
     );
-
     if (!isPasswordValid) throw new ConflictException('Invalid Credentials');
-
-    //Tao Payload
-    const payload = {
-      sub: user.id,
-      role: [user.role],
-    };
-
-    //Tao token
-    const access_Token = await this.jwt.signAsync(
-      {
-        sub: payload.sub,
-        role: payload.role,
-      },
-      {
-        secret: process.env.ACCESS_TOKEN,
-        expiresIn: 15 * 60,
-      },
-    );
+    const payload = { sub: user.id, role: [user.role] };
+    // Tạo access token
+    const access_Token = await this.jwt.signAsync(payload, {
+      secret: process.env.ACCESS_TOKEN,
+      expiresIn: 15 * 60,
+    });
+    // Tạo refresh token
     const tokenId = crypto.randomUUID();
     const refresh_Token = await this.jwt.signAsync(
-      {
-        sub: payload.sub,
-        role: payload.role,
-        jti: tokenId,
-      },
+      { ...payload, jti: tokenId },
       {
         secret: process.env.REFRESH_TOKEN,
-        expiresIn: 7 * 24 * 60 * 60, // 7 days, in seconds,
+        expiresIn: 7 * 24 * 60 * 60,
       },
     );
-
-    //hashRefreshToken
     const hash_refresh_Token = await bcrypt.hash(refresh_Token, 10);
-
-    //save hash_refresh_Token trong DB
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
     await this.prisma.refreshToken.create({
       data: {
@@ -75,32 +54,19 @@ export class AuthService {
         expiresAt: expiresAt,
       },
     });
-
-    res.cookie('access_Token', access_Token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      path: '/',
-      maxAge: 15 * 60 * 1000,
-    });
-
-    res.cookie('refresh_Token', refresh_Token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      path: '/',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
-    return res.json({
-      message: 'Successfully Logging In',
+    // em return về data ở đây thôi, xíu nữa sẽ gọi bên controller
+    return {
+      access_Token,
+      refresh_Token,
       user: {
-        id: user?.id,
+        id: user.id,
         name: user.name,
         email: user.email,
         role: user.role,
       },
-    });
+    };
   }
+
   async logout(res: Response, refershToken: string) {
     if (refershToken) {
       try {
@@ -110,7 +76,7 @@ export class AuthService {
           role: string[];
           jti: string;
         } = await this.jwt.verifyAsync(refershToken, {
-          secret: process.env.JWT_REFRESH_SECRET as string,
+          secret: process.env.REFRESH_TOKEN as string,
         });
 
         await this.prisma.refreshToken.deleteMany({
@@ -204,7 +170,7 @@ export class AuthService {
         role: payload.role,
       },
       {
-        secret: process.env.JWT_ACCESS_SECRET,
+        secret: process.env.ACCESS_TOKEN,
         expiresIn: 15 * 60,
       },
     );
@@ -216,7 +182,7 @@ export class AuthService {
         jti: newTokenId,
       },
       {
-        secret: process.env.JWT_REFRESH_SECRET,
+        secret: process.env.REFRESH_TOKEN,
         expiresIn: 7 * 24 * 60 * 60,
       },
     );
