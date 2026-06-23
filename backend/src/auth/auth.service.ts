@@ -5,7 +5,7 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { PrismaService } from 'prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { LoginDto } from 'src/dto/auth.dto';
 import { JwtService } from '@nestjs/jwt';
 import bcrypt from 'bcrypt';
@@ -89,7 +89,7 @@ export class AuthService {
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/',
-      maxAge: 15 * 60 * 1000,
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
     return res.json({
       message: 'Successfully Logging In',
@@ -155,7 +155,7 @@ export class AuthService {
     try {
       //verify refreshTOken
       payload = await this.jwt.verifyAsync(refreshToken, {
-        secret: process.env.JWT_REFRESH_SECRET,
+        secret: process.env.REFRESH_TOKEN,
       });
     } catch {
       throw new UnauthorizedException('Invalid or expired refresh token');

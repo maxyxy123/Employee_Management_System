@@ -4,7 +4,7 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { PrismaService } from 'prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { createLeavesDto, StatusDto } from 'src/dto/leaves.dto';
 import { Role } from 'src/enum/role.enum';
 @Injectable()
@@ -60,6 +60,31 @@ export class LeavesService {
     };
   }
 
+  async getMyLeaves(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) throw new NotFoundException('User not found');
+    if (user.status !== 'ACTIVE')
+      throw new UnauthorizedException('User is  InACTIVE');
+
+    const employee = await this.prisma.employee.findUnique({
+      where: { userId: user.id },
+    });
+
+    if (!employee) throw new NotFoundException('Employee Not found');
+
+    const leaves = await this.prisma.leave.findMany({
+      where: { employeeId: employee.id },
+    });
+
+    return {
+      message: 'Successfully retrieve employee leaves',
+      data: leaves,
+    };
+  }
+  
   async createLeave(leaveInput: createLeavesDto, userId: string) {
     const employee = await this.prisma.employee.findUnique({
       where: { userId: userId },
