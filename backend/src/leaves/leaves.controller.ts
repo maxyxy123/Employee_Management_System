@@ -24,16 +24,15 @@ export class LeavesController {
     return this.leavesService.getAllLeaves();
   }
 
-  @Get(':id')
-  @Roles(Role.Admin, Role.EMPLOYEE)
-  getOneLeave(@Param('id') id: string, @Req() req) {
-    return this.leavesService.getOneLeave(id, req.user);
-  }
-
   @Get('me')
   @Roles(Role.EMPLOYEE)
   getMyLeaves(@Req() req) {
     return this.leavesService.getMyLeaves(req.user.sub);
+  }
+  @Get(':id')
+  @Roles(Role.Admin, Role.EMPLOYEE)
+  getOneLeave(@Param('id') id: string, @Req() req) {
+    return this.leavesService.getOneLeave(id, req.user);
   }
 
   @Post()
