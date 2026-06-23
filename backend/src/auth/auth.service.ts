@@ -108,7 +108,7 @@ export class AuthService {
   //Refresh token cũ hợp lệ →
   // xoá token cũ → tạo access token mới + refresh token mới
   // → lưu hash refresh token mới vào DB → set lại cookie.
-  async refresh(res: Response, refreshToken: string) {
+  async refresh(refreshToken: string) {
     //check xem co token hay k
     if (!refreshToken) {
       throw new UnauthorizedException('No refresh token');
@@ -122,7 +122,7 @@ export class AuthService {
         secret: process.env.REFRESH_TOKEN,
       });
     } catch {
-      throw new UnauthorizedException('Invalid or expired refresh token');
+      throw new UnauthorizedException('Invalid refresh token');
     }
 
     //tim Refreshtoken trog db
@@ -208,59 +208,25 @@ export class AuthService {
       }),
     ]);
 
-    res.cookie('access_Token', access_Token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 15 * 60 * 1000,
-      path: '/',
-    });
-
-    res.cookie('refresh_Token', refresh_Token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-      path: '/',
-    });
-
-    return res.json({
-      message: 'Successfully refreshed tokens',
-    });
+    return {
+      access_Token,
+      refresh_Token,
+    };
   }
 
-  async getUser(req: Request, refresh_Token: string) {
-    if (!refresh_Token) {
-      throw new UnauthorizedException('Refresh token not found');
+  async getUser(accessToken: string) {
+    if (!accessToken) {
+      throw new UnauthorizedException('Access token not found');
     }
 
-    let payload: { sub: string; role: string[]; jti: string };
+    let payload: { sub: string; role: string[] };
 
     try {
-      payload = await this.jwt.verifyAsync(refresh_Token, {
-        secret: process.env.REFRESH_TOKEN,
+      payload = await this.jwt.verifyAsync(accessToken, {
+        secret: process.env.ACCESS_TOKEN,
       });
-    } catch (error) {
-      console.log(error);
-      throw new UnauthorizedException('Invalid or expired refresh token');
-    }
-
-    const savedToken = await this.prisma.refreshToken.findUnique({
-      where: { id: payload.jti },
-    });
-
-    if (!savedToken) {
-      throw new UnauthorizedException('Refresh token revoked');
-    }
-
-    const isTokenMatch = await bcrypt.compare(refresh_Token, savedToken.token);
-
-    if (!isTokenMatch) {
-      throw new UnauthorizedException('Invalid refresh token');
-    }
-
-    if (savedToken.expiresAt < new Date()) {
-      throw new UnauthorizedException('Refresh token expired');
+    } catch {
+      throw new UnauthorizedException('Invalid or expired access token');
     }
 
     const user = await this.prisma.user.findUnique({
@@ -285,7 +251,7 @@ export class AuthService {
 
     return {
       message: 'Successfully found user',
-      data: user,
+      user,
     };
   }
 }
