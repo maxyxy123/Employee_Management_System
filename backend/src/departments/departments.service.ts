@@ -13,8 +13,7 @@ export class DepartmentsService {
   async getAllDepartments() {
     const departments = await this.prisma.department.findMany();
     return {
-      message: 'Successfully get all departments',
-      data: departments,
+      departments,
     };
   }
 
@@ -27,8 +26,7 @@ export class DepartmentsService {
     });
     if (!department) throw new NotFoundException('Department not found');
     return {
-      message: 'Successfully get one department',
-      data: department,
+      department,
     };
   }
 
@@ -45,8 +43,7 @@ export class DepartmentsService {
       },
     });
     return {
-      message: 'Successfully create Department',
-      data: createdDepartment,
+      createdDepartment,
     };
   }
 
@@ -90,8 +87,7 @@ export class DepartmentsService {
     });
 
     return {
-      message: 'Successfully updated Department information',
-      data: updatedDepartment,
+      updatedDepartment,
     };
   }
 
@@ -111,8 +107,7 @@ export class DepartmentsService {
       where: { id: department.id },
     });
     return {
-      message: 'Successfully delete this department',
-      data: deletedDepartment,
+      deletedDepartment,
     };
   }
 }
