@@ -20,8 +20,7 @@ export class EmployeesService {
     if (allEmployee.length === 0)
       throw new NotFoundException('There is no Employee in any departments');
     return {
-      message: 'Successfully retreive all employees',
-      data: allEmployee,
+      allEmployee,
     };
   }
 
@@ -40,8 +39,7 @@ export class EmployeesService {
     if (!employee) throw new NotFoundException('Employee not found');
 
     return {
-      message: 'Successfully retrieved user data',
-      data: employee,
+       employee,
     };
   }
 
@@ -92,8 +90,7 @@ export class EmployeesService {
       return createdEmployee;
     });
     return {
-      message: 'Successfully create User and Employee',
-      data: employee,
+      employee,
     };
   }
 
@@ -119,8 +116,7 @@ export class EmployeesService {
     });
 
     return {
-      message: 'Successfully updated',
-      data: updateEmployee,
+     updateEmployee,
     };
   }
 
@@ -146,8 +142,7 @@ export class EmployeesService {
     });
 
     return {
-      message: 'Successfully delete this employee',
-      data: result,
+       result,
     };
   }
 }

@@ -9,41 +9,63 @@ import {
 } from '@nestjs/common';
 import { EmployeesService } from './employees.service';
 import { EmployeesDto, UpdateEmployeeDto } from 'src/dto/employee.dto';
-import type { Request } from 'express';
+import { Roles } from 'src/decorators/role.decorator';
+import { Role } from 'src/enum/role.enum';
 
 @Controller('employees')
+@Roles(Role.Admin)
 export class EmployeesController {
   constructor(private readonly employeesService: EmployeesService) {}
 
   @Get()
-  getAllEmployee() {
-    return this.employeesService.getAllEmployee();
+  async getAllEmployee() {
+    const data = await this.employeesService.getAllEmployee();
+    return {
+      message: 'Successfully retreive all employees',
+      data: data.allEmployee,
+    };
   }
 
   @Get(':id')
-  getOneEmployee(@Param('id') id: string) {
-    return this.employeesService.getOneEmployee(id);
+  async getOneEmployee(@Param('id') id: string) {
+    const data = await this.employeesService.getOneEmployee(id);
+    return {
+      message: 'Successfully retrieved user data',
+      data: data.employee,
+    };
   }
 
   //POST /employees
   @Post()
-  createEmploye(@Body() employeeInput: EmployeesDto) {
+  async createEmploye(@Body() employeeInput: EmployeesDto) {
     console.log(employeeInput.password);
-    return this.employeesService.createEmployee(employeeInput);
+    const data = await this.employeesService.createEmployee(employeeInput);
+    return {
+      message: 'Successfully create User and Employee',
+      data: data.employee,
+    };
   }
 
-  //PUT /employees/:id
+  //PUT /employeconst data = await
   @Put(':id')
-  updateEmployee(
+  async updateEmployee(
     @Body() employeeInput: UpdateEmployeeDto,
     @Param('id') id: string,
   ) {
-    return this.employeesService.updateEmployee(employeeInput, id);
+    const data = await this.employeesService.updateEmployee(employeeInput, id);
+    return {
+      message: 'Successfully updated',
+      data: data.updateEmployee,
+    };
   }
 
   //DELETE /employees/:id
   @Delete(':id')
-  deleteEmployee(@Param('id') id: string) {
-    return this.employeesService.deleteEmployee(id);
+  async deleteEmployee(@Param('id') id: string) {
+    const data = await this.employeesService.deleteEmployee(id);
+    return {
+      message: 'Successfully delete this employee',
+      data: data.result,
+    };
   }
 }
