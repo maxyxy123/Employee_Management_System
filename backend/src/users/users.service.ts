@@ -30,10 +30,10 @@ export class UsersService {
       throw new NotFoundException('No active user found');
 
     return {
-      meassage: 'Successfully get all Active User',
-      data: allUser,
+      allUser,
     };
   }
+
   async getOneUser(userId: string) {
     if (!userId) {
       throw new BadRequestException('User id is required');
@@ -51,8 +51,7 @@ export class UsersService {
     });
     if (!user) throw new NotFoundException('User not found');
     return {
-      message: 'Successfully found user',
-      data: user,
+      user,
     };
   }
 
@@ -78,8 +77,7 @@ export class UsersService {
       },
     });
     return {
-      message: 'Successfully update User Role',
-      data: updatedRoleForUser,
+      updatedRoleForUser,
     };
   }
 
@@ -106,8 +104,7 @@ export class UsersService {
       },
     });
     return {
-      message: 'Successfully update Status',
-      data: updatedUserStatus,
+       updatedUserStatus,
     };
   }
 
@@ -135,8 +132,7 @@ export class UsersService {
       },
     });
     return {
-      message: 'Successfully change Password',
-      data: updatePasswordForUser,
+     updatePasswordForUser,
     };
   }
 }

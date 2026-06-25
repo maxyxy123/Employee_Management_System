@@ -14,30 +14,53 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
-  getAllUser() {
-    return this.usersService.getAllUser();
+  async getAllUser() {
+    const data = await this.usersService.getAllUser();
+    return {
+      meassage: 'Successfully get all Active User',
+      data: data.allUser,
+    };
   }
 
   @Get(':id')
-  getOneUser(@Param('id') id: string) {
-    return this.usersService.getOneUser(id);
+  async getOneUser(@Param('id') id: string) {
+    const data = await this.usersService.getOneUser(id);
+    return {
+      message: 'Successfully found user',
+      data: data.user,
+    };
   }
 
   @Put(':id/role')
-  updateRole(@Param('id') id: string, @Body() updateRole: UpdateRoleDto) {
-    return this.usersService.updateRole(id, updateRole);
+  async updateRole(@Param('id') id: string, @Body() updateRole: UpdateRoleDto) {
+    const data = await this.usersService.updateRole(id, updateRole);
+    return {
+      message: 'Successfully update User Role',
+      data: data.updatedRoleForUser,
+    };
   }
 
   @Put(':id/status')
-  updateStatus(@Param('id') id: string, @Body() updateStatus: UpdateStatusDto) {
-    return this.usersService.updateStatus(id, updateStatus);
+  async updateStatus(
+    @Param('id') id: string,
+    @Body() updateStatus: UpdateStatusDto,
+  ) {
+    const data = await this.usersService.updateStatus(id, updateStatus);
+    return {
+      message: 'Successfully update Status',
+      data: data.updatedUserStatus,
+    };
   }
 
   @Put(':id/password')
-  updatePassword(
+  async updatePassword(
     @Param('id') id: string,
     @Body() updatePassword: UpdatePasswordDto,
   ) {
-    return this.usersService.updatePassword(id, updatePassword);
+    const data = await this.usersService.updatePassword(id, updatePassword);
+    return {
+      message: 'Successfully change Password',
+      data: data.updatePasswordForUser,
+    };
   }
 }
