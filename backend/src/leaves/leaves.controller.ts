@@ -54,7 +54,7 @@ export class LeavesController {
   @Roles(Role.EMPLOYEE)
   async createLeave(@Body() leaveInput: createLeavesDto, @Req() req) {
     const userId = req.user.sub as string;
-    const data = await this.leavesService.createLeave(leaveInput, req.user.sub);
+    const data = await this.leavesService.createLeave(leaveInput, userId);
     return {
       message: 'Successfully create Leave request',
       data: data.leave,
