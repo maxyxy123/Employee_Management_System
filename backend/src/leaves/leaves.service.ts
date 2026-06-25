@@ -15,8 +15,31 @@ export class LeavesService {
     const leaves = await this.prisma.leave.findMany();
 
     return {
-      message: 'Successfully get all Leaves',
-      data: leaves,
+      leaves,
+    };
+  }
+
+  async getMyLeaves(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) throw new NotFoundException('User not found');
+    if (user.status !== 'ACTIVE')
+      throw new UnauthorizedException('User is  InACTIVE');
+
+    const employee = await this.prisma.employee.findUnique({
+      where: { userId: user.id },
+    });
+
+    if (!employee) throw new NotFoundException('Employee Not found');
+
+    const leaves = await this.prisma.leave.findMany({
+      where: { employeeId: employee.id },
+    });
+
+    return {
+      leaves,
     };
   }
 
@@ -55,36 +78,10 @@ export class LeavesService {
     }
 
     return {
-      message: 'Successfully get one Leave',
-      data: leave,
+      leave,
     };
   }
 
-  async getMyLeaves(userId: string) {
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
-    });
-
-    if (!user) throw new NotFoundException('User not found');
-    if (user.status !== 'ACTIVE')
-      throw new UnauthorizedException('User is  InACTIVE');
-
-    const employee = await this.prisma.employee.findUnique({
-      where: { userId: user.id },
-    });
-
-    if (!employee) throw new NotFoundException('Employee Not found');
-
-    const leaves = await this.prisma.leave.findMany({
-      where: { employeeId: employee.id },
-    });
-
-    return {
-      message: 'Successfully retrieve employee leaves',
-      data: leaves,
-    };
-  }
-  
   async createLeave(leaveInput: createLeavesDto, userId: string) {
     const employee = await this.prisma.employee.findUnique({
       where: { userId: userId },
@@ -102,8 +99,7 @@ export class LeavesService {
       },
     });
     return {
-      message: 'Successfully create Leave request',
-      data: leave,
+      leave,
     };
   }
 
@@ -124,8 +120,7 @@ export class LeavesService {
     });
 
     return {
-      message: 'Successfully updated status for this leave request',
-      data: updatedLeaveStatus,
+      updatedLeaveStatus,
     };
   }
 
@@ -140,8 +135,7 @@ export class LeavesService {
       where: { id: leave.id },
     });
     return {
-      message: 'Successfully delete this leave request',
-      data: deletedLeave,
+      deletedLeave,
     };
   }
 }
