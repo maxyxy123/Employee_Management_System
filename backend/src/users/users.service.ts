@@ -104,7 +104,7 @@ export class UsersService {
       },
     });
     return {
-       updatedUserStatus,
+      updatedUserStatus,
     };
   }
 
@@ -132,7 +132,7 @@ export class UsersService {
       },
     });
     return {
-     updatePasswordForUser,
+      updatePasswordForUser,
     };
   }
 }
