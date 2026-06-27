@@ -9,7 +9,6 @@ import { PrismaService } from '../prisma/prisma.service';
 import { LoginDto } from 'src/dto/auth.dto';
 import { JwtService } from '@nestjs/jwt';
 import bcrypt from 'bcrypt';
-import type { Request, Response } from 'express';
 @Injectable()
 export class AuthService {
   constructor(
@@ -66,8 +65,10 @@ export class AuthService {
       },
     };
   }
+  // access_Token: access_Token,
+  //     refresh_Token: refresh_Token,
 
-  async logout(refreshToken: string) {
+  async logout(refreshToken: string | null) {
     if (!refreshToken) {
       return;
     }
@@ -75,7 +76,7 @@ export class AuthService {
     try {
       const payload: {
         sub: string;
-        role: string;
+        role: string[];
         jti: string;
       } = await this.jwt.verifyAsync(refreshToken, {
         secret: process.env.REFRESH_TOKEN as string,
@@ -108,7 +109,7 @@ export class AuthService {
   //Refresh token cũ hợp lệ →
   // xoá token cũ → tạo access token mới + refresh token mới
   // → lưu hash refresh token mới vào DB → set lại cookie.
-  async refresh(refreshToken: string) {
+  async refresh(refreshToken: string | null) {
     //check xem co token hay k
     if (!refreshToken) {
       throw new UnauthorizedException('No refresh token');
@@ -214,7 +215,7 @@ export class AuthService {
     };
   }
 
-  async getUser(accessToken: string) {
+  async getUser(accessToken: string | null) {
     if (!accessToken) {
       throw new UnauthorizedException('Access token not found');
     }
@@ -223,7 +224,7 @@ export class AuthService {
 
     try {
       payload = await this.jwt.verifyAsync(accessToken, {
-        secret: process.env.ACCESS_TOKEN,
+        secret: process.env.ACCESS_TOKEN, //ACCESS_TOKEN
       });
     } catch {
       throw new UnauthorizedException('Invalid or expired access token');
@@ -250,7 +251,6 @@ export class AuthService {
     }
 
     return {
-      message: 'Successfully found user',
       user,
     };
   }

@@ -84,7 +84,7 @@ export class AuthController {
     const data = await this.authService.getUser(access_Token);
 
     return {
-      message: data.message,
+      message: 'Successfully found user',
       data: data.user,
     };
   }
