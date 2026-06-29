@@ -11,8 +11,29 @@ import { APP_GUARD } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
 import { RolesGuard } from './guards/roles.guard';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { CacheModule } from '@nestjs/cache-manager';
+import { createKeyv } from '@keyv/redis';
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+
+    CacheModule.registerAsync({
+      isGlobal: true,
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        ttl: Number(configService.get('CACHE_TTL')) || 60000,
+        stores: [
+          createKeyv(
+            configService.get<string>('REDIS_URL') || 'redis://localhost:6379',
+          ),
+        ],
+      }),
+    }),
+
     AuthModule,
     UsersModule,
     EmployeesModule,

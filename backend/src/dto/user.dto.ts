@@ -1,4 +1,5 @@
 import { IsEnum, IsNotEmpty, IsString, Length } from 'class-validator';
+import { Prisma } from 'src/generated/prisma/client';
 
 enum Role {
   ADMIN = 'ADMIN',
@@ -10,6 +11,16 @@ enum UserStatus {
   INACTIVE = 'INACTIVE',
 }
 
+export type User = Prisma.UserGetPayload<{
+  select: {
+    id: true;
+    name: true;
+    email: true;
+    role: true;
+    status: true;
+    createdAt: true;
+  };
+}>;
 export class UpdateRoleDto {
   @IsNotEmpty()
   @IsEnum(Role)

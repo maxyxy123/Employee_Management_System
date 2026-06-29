@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -8,13 +9,27 @@ import {
   UpdatePasswordDto,
   UpdateRoleDto,
   UpdateStatusDto,
+  User,
 } from 'src/dto/user.dto';
 import bcrypt from 'bcrypt';
+import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
 @Injectable()
 export class UsersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+  ) {}
 
   async getAllUser() {
+    const cached_key = 'user:all';
+
+    const cachedUsers = await this.cacheManager.get<User[]>(cached_key);
+
+    if (cachedUsers !== undefined && cachedUsers !== null) {
+      console.log('CACHE HIT');
+      return cachedUsers;
+    }
+
     const allUser = await this.prisma.user.findMany({
       where: { status: 'ACTIVE' },
       select: {
@@ -29,15 +44,23 @@ export class UsersService {
     if (allUser.length === 0)
       throw new NotFoundException('No active user found');
 
-    return {
-      allUser,
-    };
+    await this.cacheManager.set(cached_key, allUser, 60000);
+
+    return allUser;
   }
 
   async getOneUser(userId: string) {
     if (!userId) {
       throw new BadRequestException('User id is required');
     }
+    const cached_key = `user:id:${userId}`;
+    const cacheUser = await this.cacheManager.get(cached_key);
+
+    if (cacheUser !== undefined && cacheUser !== null) {
+      console.log('CACHE HIT');
+      return cacheUser;
+    }
+
     const user = await this.prisma.user.findUnique({
       where: { id: userId, status: 'ACTIVE' },
       select: {
@@ -50,9 +73,9 @@ export class UsersService {
       },
     });
     if (!user) throw new NotFoundException('User not found');
-    return {
-      user,
-    };
+
+    await this.cacheManager.set(cached_key, user, 60000);
+    return user;
   }
 
   async updateRole(userId: string, updateRole: UpdateRoleDto) {
@@ -76,6 +99,11 @@ export class UsersService {
         updatedAt: true,
       },
     });
+
+    //Vi thay doi ca user nen xoa ca cache cua allUser
+    await this.cacheManager.del(`user:id:${userId}`);
+    await this.cacheManager.del('users:all');
+
     return {
       updatedRoleForUser,
     };
@@ -103,6 +131,10 @@ export class UsersService {
         updatedAt: true,
       },
     });
+
+    await this.cacheManager.del(`user:id:${userId}`);
+    await this.cacheManager.del('users:all');
+
     return {
       updatedUserStatus,
     };
@@ -131,6 +163,9 @@ export class UsersService {
         updatedAt: true,
       },
     });
+
+    await this.cacheManager.del(`user:id:${userId}`);
+
     return {
       updatePasswordForUser,
     };
