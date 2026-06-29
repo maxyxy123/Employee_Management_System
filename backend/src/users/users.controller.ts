@@ -15,19 +15,19 @@ export class UsersController {
 
   @Get()
   async getAllUser() {
-    const data = await this.usersService.getAllUser();
+    const users = await this.usersService.getAllUser();
     return {
       meassage: 'Successfully get all Active User',
-      data: data.allUser,
+      data: users,
     };
   }
 
   @Get(':id')
   async getOneUser(@Param('id') id: string) {
-    const data = await this.usersService.getOneUser(id);
+    const user = await this.usersService.getOneUser(id);
     return {
       message: 'Successfully found user',
-      data: data.user,
+      data: user,
     };
   }
 
