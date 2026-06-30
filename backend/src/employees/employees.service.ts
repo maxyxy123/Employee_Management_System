@@ -1,16 +1,33 @@
 import {
   ConflictException,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { EmployeesDto, UpdateEmployeeDto } from 'src/dto/employee.dto';
+import {
+  EmployeesDto,
+  EmployeeTypeForCache,
+  UpdateEmployeeDto,
+} from 'src/dto/employee.dto';
 import bcrypt from 'bcrypt';
+import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
 @Injectable()
 export class EmployeesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+  ) {}
 
   async getAllEmployee() {
+    const cached_key = 'employee:all';
+    const cacheEmployees =
+      await this.cacheManager.get<EmployeeTypeForCache[]>(cached_key);
+
+    if (cacheEmployees !== undefined && cacheEmployees !== null) {
+      return cacheEmployees;
+    }
+
     const allEmployee = await this.prisma.employee.findMany({
       include: {
         user: true,
@@ -19,14 +36,20 @@ export class EmployeesService {
     });
     if (allEmployee.length === 0)
       throw new NotFoundException('There is no Employee in any departments');
-    return {
-      allEmployee,
-    };
+
+    await this.cacheManager.set(cached_key, allEmployee);
+
+    return allEmployee;
   }
 
   async getOneEmployee(employeeId: string) {
-    //findUnique ko tim thay return null
+    const cached_key = `employee:id:${employeeId}`;
+    const cachedEmployee = await this.cacheManager.get(cached_key);
 
+    if (cachedEmployee !== undefined && cachedEmployee !== null) {
+      return cachedEmployee;
+    }
+    //findUnique ko tim thay return null
     const employee = await this.prisma.employee.findUnique({
       where: { id: employeeId },
       include: {
@@ -38,9 +61,9 @@ export class EmployeesService {
 
     if (!employee) throw new NotFoundException('Employee not found');
 
-    return {
-       employee,
-    };
+    await this.cacheManager.set(cached_key, employee);
+
+    return employee;
   }
 
   async createEmployee(employeeInput: EmployeesDto) {
@@ -89,6 +112,8 @@ export class EmployeesService {
 
       return createdEmployee;
     });
+
+    await this.cacheManager.del('employee:all');
     return {
       employee,
     };
@@ -115,8 +140,11 @@ export class EmployeesService {
       },
     });
 
+    await this.cacheManager.del('employee:all');
+    await this.cacheManager.del(`employee:id:${userId}`);
+
     return {
-     updateEmployee,
+      updateEmployee,
     };
   }
 
@@ -141,8 +169,11 @@ export class EmployeesService {
       };
     });
 
+    await this.cacheManager.del('employee:all');
+    await this.cacheManager.del(`employee:id:${userId}`);
+
     return {
-       result,
+      result,
     };
   }
 }

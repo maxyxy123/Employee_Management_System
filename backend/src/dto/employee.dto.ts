@@ -7,6 +7,7 @@ import {
   IsEmail,
 } from 'class-validator';
 import { Type } from 'class-transformer';
+import { Prisma } from 'src/generated/prisma/client';
 
 export class EmployeesDto {
   //User Dto
@@ -66,3 +67,11 @@ export class UpdateEmployeeDto {
   @IsString()
   address: string;
 }
+
+export type EmployeeTypeForCache = Prisma.EmployeeGetPayload<{
+  include: {
+    user: true;
+    department: true;
+    leaves: true;
+  };
+}>;

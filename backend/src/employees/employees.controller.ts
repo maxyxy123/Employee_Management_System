@@ -19,19 +19,19 @@ export class EmployeesController {
 
   @Get()
   async getAllEmployee() {
-    const data = await this.employeesService.getAllEmployee();
+    const allEmployee = await this.employeesService.getAllEmployee();
     return {
       message: 'Successfully retreive all employees',
-      data: data.allEmployee,
+      data: allEmployee,
     };
   }
 
   @Get(':id')
   async getOneEmployee(@Param('id') id: string) {
-    const data = await this.employeesService.getOneEmployee(id);
+    const employee = await this.employeesService.getOneEmployee(id);
     return {
       message: 'Successfully retrieved user data',
-      data: data.employee,
+      data: employee,
     };
   }
 
