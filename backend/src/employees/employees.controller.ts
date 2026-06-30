@@ -29,8 +29,9 @@ export class EmployeesController {
   @Get(':id')
   async getOneEmployee(@Param('id') id: string) {
     const employee = await this.employeesService.getOneEmployee(id);
+
     return {
-      message: 'Successfully retrieved user data',
+      message: 'Successfully retrieved employee data',
       data: employee,
     };
   }

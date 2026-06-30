@@ -30,7 +30,11 @@ export class EmployeesService {
 
     const allEmployee = await this.prisma.employee.findMany({
       include: {
-        user: true,
+        user: {
+          omit: {
+            password: true,
+          },
+        },
         department: true,
       },
     });
