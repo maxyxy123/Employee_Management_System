@@ -19,29 +19,29 @@ export class DepartmentsController {
 
   @Get()
   async getAllDepartments() {
-    const data = await this.departmentsService.getAllDepartments();
+    const Alldepartments = await this.departmentsService.getAllDepartments();
     return {
       message: 'Successfully get all departments',
-      data: data.departments,
+      data: Alldepartments,
     };
   }
 
   @Get(':id')
   async getOneDepartments(@Param('id') id: string) {
-    const data = await this.departmentsService.getOneDepartments(id);
+    const department = await this.departmentsService.getOneDepartments(id);
     return {
       message: 'Successfully get one department',
-      data: data.department,
+      data: department,
     };
   }
 
   @Post()
   async createDepartment(@Body() departmentInput: DepartmentDto) {
-    const data =
+    const createdDepartment =
       await this.departmentsService.createDepartment(departmentInput);
     return {
       message: 'Successfully create Department',
-      data: data.createdDepartment,
+      data: createdDepartment,
     };
   }
 
@@ -50,22 +50,23 @@ export class DepartmentsController {
     @Body() departmentInput: UpdateDepartmentDto,
     @Param('id') id: string,
   ) {
-    const data = await this.departmentsService.updateDepartment(
+    const updatedDepartment = await this.departmentsService.updateDepartment(
       departmentInput,
       id,
     );
     return {
       message: 'Successfully updated Department information',
-      data: data.updatedDepartment,
+      data: updatedDepartment,
     };
   }
 
   @Delete(':id')
   async deleteDepartment(@Param('id') id: string) {
-    const data = await this.departmentsService.deleteDepartment(id);
+    const deletedDepartment =
+      await this.departmentsService.deleteDepartment(id);
     return {
       message: 'Successfully delete this department',
-      data: data.deletedDepartment,
+      data: deletedDepartment,
     };
   }
 }
