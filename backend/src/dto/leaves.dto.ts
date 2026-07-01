@@ -1,4 +1,5 @@
 import { IsDateString, IsEnum, IsString, Length } from 'class-validator';
+import { Prisma } from 'src/generated/prisma/client';
 
 enum LeaveStatus {
   PENDING = 'PENDING',
@@ -29,3 +30,27 @@ export class StatusDto {
   @IsEnum(LeaveStatus)
   status: LeaveStatus;
 }
+
+export type AllLeavesTypeforCache = Prisma.DepartmentGetPayload<{
+  include: {
+    employees: true;
+  };
+}>;
+
+export type LeaveWithEmployeeUser = Prisma.LeaveGetPayload<{
+  include: {
+    employee: {
+      include: {
+        user: {
+          select: {
+            id: true;
+            name: true;
+            email: true;
+            role: true;
+            status: true;
+          };
+        };
+      };
+    };
+  };
+}>;
