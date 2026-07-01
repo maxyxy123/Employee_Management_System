@@ -1,15 +1,29 @@
 import {
+  Inject,
   Injectable,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
 
 @Injectable()
 export class DashboardService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
+  ) {}
 
   async getDashboardAdmin(userId: string) {
+    const cache_key = `dashboard:AdminId:${userId}`;
+
+    const cacheDashboardData = await this.cacheManager.get(cache_key);
+
+    if (cacheDashboardData !== undefined && cacheDashboardData !== null) {
+      console.log('CACHED HIT');
+      return cacheDashboardData;
+    }
+
     const [
       admin,
       totalEmployees,
@@ -31,6 +45,20 @@ export class DashboardService {
         where: { status: 'PENDING' },
       }),
     ]);
+
+    await this.cacheManager.set(cache_key, {
+      admin: {
+        name: admin?.name,
+        role: admin?.role,
+      },
+
+      stats: {
+        totalEmployees: totalEmployees,
+        totalDepartments: totalDepartments,
+        totalLeaves: totalLeaves,
+        pendingLeaves: pendingLeaves,
+      },
+    });
 
     return {
       admin: {
@@ -70,6 +98,14 @@ export class DashboardService {
     });
     if (!employee) throw new NotFoundException('employee not found');
 
+    const cache_key = `dashboard:employeeId:${userId}`;
+    const cacheDashboardData = await this.cacheManager.get(cache_key);
+
+    if (cacheDashboardData !== undefined && cacheDashboardData !== null) {
+      console.log('CACHED HIT');
+      return cacheDashboardData;
+    }
+
     const [totalLeaves, pendingLeaves, approvedLeaves, rejectedLeaves] =
       await Promise.all([
         this.prisma.leave.count({
@@ -85,6 +121,27 @@ export class DashboardService {
           where: { employeeId: employee.id, status: 'REJECTED' },
         }),
       ]);
+
+    await this.cacheManager.set(cache_key, {
+      profile: {
+        id: employee.id,
+        employeeCode: employee.employeeCode,
+        name: employee.user.name,
+        email: employee.user.email,
+        phone: employee.phone,
+        position: employee.position,
+        department: employee.department?.name || null,
+        joinDate: employee.joinDate,
+        avatar: employee.avatar,
+        status: user.status,
+      },
+      stats: {
+        totalLeaves: totalLeaves,
+        pendingLeaves: pendingLeaves,
+        approvedLeaves: approvedLeaves,
+        rejectedLeaves: rejectedLeaves,
+      },
+    });
 
     return {
       profile: {

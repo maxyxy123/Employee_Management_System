@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { Controller, Get, Req } from '@nestjs/common';
 import { DashboardService } from './dashboard.service';
 import { Roles } from 'src/decorators/role.decorator';
@@ -12,8 +13,7 @@ export class DashboardController {
     const data = await this.dashboardService.getDashboardAdmin(req.user.sub);
     return {
       message: 'Successfully get Dashboard Admin',
-      data: data.admin,
-      stats: data.stats,
+      data: data,
     };
   }
 
@@ -23,8 +23,7 @@ export class DashboardController {
     const data = await this.dashboardService.getDashboardEmployee(req.user.sub);
     return {
       message: 'Successfully get employee dashboard',
-      data: data.profile,
-      stats: data.stats,
+      data: data,
     };
   }
 }
