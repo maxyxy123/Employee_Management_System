@@ -4,12 +4,17 @@ import { Post, Body, Res } from '@nestjs/common';
 import { LoginDto } from 'src/dto/auth.dto';
 import type { Request, Response } from 'express';
 import { Public } from 'src/decorators/public.decorator';
-
+import { SkipThrottle, Throttle } from '@nestjs/throttler';
 @Public()
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
-
+  @Throttle({
+    default: {
+      limit: 5,
+      ttl: 60_000,
+    },
+  })
   @Post('login')
   async login(@Body() loginInput: LoginDto, @Res() res: Response) {
     const data = await this.authService.login(loginInput);
@@ -29,7 +34,7 @@ export class AuthController {
     });
     return res.json({ message: 'Successfully Logging In', user: data.user });
   }
-
+  @SkipThrottle()
   @Post('logout')
   async logout(@Res() res: Response, @Req() req: Request) {
     const refresh_Token = req.cookies.refresh_Token as string;
@@ -52,6 +57,12 @@ export class AuthController {
     });
   }
 
+  @Throttle({
+    default: {
+      limit: 10,
+      ttl: 60_000,
+    },
+  })
   @Post('refresh')
   async refresh(@Res() res: Response, @Req() req: Request) {
     const refresh_Token = req.cookies.refresh_Token as string;
