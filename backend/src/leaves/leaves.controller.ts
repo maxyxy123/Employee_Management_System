@@ -21,10 +21,10 @@ export class LeavesController {
   @Get()
   @Roles(Role.Admin)
   async getAllLeaves() {
-    const data = await this.leavesService.getAllLeaves();
+    const AllLeaves = await this.leavesService.getAllLeaves();
     return {
       message: 'Successfully get all Leaves',
-      data: data.leaves,
+      data: AllLeaves,
     };
   }
 
@@ -32,10 +32,10 @@ export class LeavesController {
   @Roles(Role.EMPLOYEE)
   async getMyLeaves(@Req() req) {
     const userId = req.user.sub as string;
-    const data = await this.leavesService.getMyLeaves(userId);
+    const leaves = await this.leavesService.getMyLeaves(userId);
     return {
       message: 'Successfully retrieve employee leaves',
-      data: data.leaves,
+      data: leaves,
     };
   }
 
@@ -54,10 +54,10 @@ export class LeavesController {
   @Roles(Role.EMPLOYEE)
   async createLeave(@Body() leaveInput: createLeavesDto, @Req() req) {
     const userId = req.user.sub as string;
-    const data = await this.leavesService.createLeave(leaveInput, userId);
+    const leave = await this.leavesService.createLeave(leaveInput, userId);
     return {
       message: 'Successfully create Leave request',
-      data: data.leave,
+      data: leave,
     };
   }
 
@@ -68,20 +68,23 @@ export class LeavesController {
     @Body() statusInput: StatusDto,
     @Param('id') id: string,
   ) {
-    const data = await this.leavesService.updateLeaveStatus(statusInput, id);
+    const updatedLeaveStatus = await this.leavesService.updateLeaveStatus(
+      statusInput,
+      id,
+    );
     return {
       message: 'Successfully updated status for this leave request',
-      data: data.updatedLeaveStatus,
+      data: updatedLeaveStatus,
     };
   }
 
   @Delete(':id')
   @Roles(Role.Admin)
   async deleteLeave(@Param('id') id: string) {
-    const data = await this.leavesService.deleteLeave(id);
+    const deletedLeave = await this.leavesService.deleteLeave(id);
     return {
       message: 'Successfully delete this leave request',
-      data: data.deletedLeave,
+      data: deletedLeave,
     };
   }
 }
