@@ -28,35 +28,42 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 
-const navItems = [
-  {
-    title: "Dashboard",
-    href: "/admin",
-    icon: LayoutDashboard,
-  },
-  {
-    title: "Attendance",
-    href: "/admin/attendance",
-    icon: CalendarCheck,
-  },
-  {
-    title: "Leave",
-    href: "/admin/leaves",
-    icon: ClipboardList,
-  },
-  {
-    title: "Payslips",
-    href: "/admin/payslips",
-    icon: Wallet,
-  },
-  {
-    title: "Settings",
-    href: "/admin/settings",
-    icon: Settings,
-  },
-]
+
+
 
 export function AppSidebar() {
+  console.log("AdminSidebar render")
+
+  const navItems = [
+    {
+      title: "Dashboard",
+      href: "/admin",
+      icon: LayoutDashboard,
+    },
+    {
+      title: "Attendance",
+      href: "/admin/attendance",
+      icon: CalendarCheck,
+    },
+    {
+      title: "Leave",
+      href: "/admin/leaves",
+      icon: ClipboardList,
+    },
+    {
+      title: "Payslips",
+      href: "/admin/payslips",
+      icon: Wallet,
+    },
+    {
+      title: "Settings",
+      href: "/admin/settings",
+      icon: Settings,
+    },
+  ]
+
+
+
   const pathname = usePathname()
 
   const isActive = (href: string) => {

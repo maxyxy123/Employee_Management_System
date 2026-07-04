@@ -3,34 +3,42 @@
 import { Building2, CalendarDays, FileText, UsersRound } from "lucide-react"
 
 import { Card, CardContent } from "@/components/ui/card"
-import { adminDashboardStats } from "@/api/dashboard.api"
-
-
-//Mock dashboardStats
-const dashboardStats = [
-  {
-    title: "Total Employees",
-    value: 3,
-    icon: UsersRound,
-  },
-  {
-    title: "Departments",
-    value: 10,
-    icon: Building2,
-  },
-  {
-    title: "Today's Attendance",
-    value: 1,
-    icon: CalendarDays,
-  },
-  {
-    title: "Pending Leaves",
-    value: 1,
-    icon: FileText,
-  },
-]
-
+import { UseGetAdminDashboard } from "@/hooks/dashboard/use-getAdminDashboard"
+import { AppLoading } from "@/components/shared/loading"
 export default function AdminDashboardPage() {
+  const { data:admin, isLoading } = UseGetAdminDashboard()
+
+
+   if (isLoading) {
+     return <AppLoading />
+  }
+  
+  const dashboardStats = [
+    {
+      title: "Total Employees",
+      value: admin.data.stats.totalEmployees,
+      icon: UsersRound,
+    },
+    {
+      title: "Departments",
+      value: admin.data.stats.totalDepartments,
+      icon: Building2,
+    },
+    {
+      title: "Total Leaves",
+      value: admin.data.stats.totalLeaves,
+      icon: CalendarDays,
+    },
+    {
+      title: "Pending Leaves",
+      value: admin.data.stats.pendingLeaves,
+      icon: FileText,
+    },
+  ]
+
+ 
+
+
   return (
     <div className="min-h-screen bg-[#f8fafc]">
       <div className="space-y-8">

@@ -10,15 +10,7 @@ type ProvidersProps = {
 export function Providers({ children }: ProvidersProps) {
   const [queryClient] = useState(
     () =>
-      new QueryClient({
-        defaultOptions: {
-          queries: {
-            staleTime: 1000 * 60,
-            refetchOnWindowFocus: false,
-            retry: 1,
-          },
-        },
-      })
+      new QueryClient()
   )
 
   return (
