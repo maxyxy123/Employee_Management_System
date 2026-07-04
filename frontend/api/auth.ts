@@ -3,7 +3,7 @@ import { LoginSchemaType } from "@/schema/auth.schema"
 
 export const login = async (data: LoginSchemaType) => {
   const res = await api.post("/auth/login", data)
-    console.log("login API", res.data)
+    console.log("login API", res.data.user)
   return res.data
 }
 
@@ -19,5 +19,6 @@ export const refresh = async () => {
 
 export const getCurrentUser = async () => {
   const res = await api.get("/auth/me")
+  console.log("Get current user:" , res.data)
   return res.data
 }

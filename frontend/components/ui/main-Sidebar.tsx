@@ -10,6 +10,7 @@ import {
   Settings,
   User,
   Wallet,
+  PersonStandingIcon,
 } from "lucide-react"
 
 import {
@@ -21,37 +22,45 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-
-const navItems = [
-  {
-    title: "Dashboard",
-    href: "/admin",
-    icon: LayoutDashboard,
-  },
-  {
-    title: "Attendance",
-    href: "/admin/attendance",
-    icon: CalendarCheck,
-  },
-  {
-    title: "Leave",
-    href: "/admin/leaves",
-    icon: ClipboardList,
-  },
-  {
-    title: "Payslips",
-    href: "/admin/payslips",
-    icon: Wallet,
-  },
-  {
-    title: "Settings",
-    href: "/admin/settings",
-    icon: Settings,
-  },
-]
+import { UseGetCurrentUser } from "@/hooks/auth/use-getMe"
 
 export function MainSidebar() {
   const pathname = usePathname()
+
+  const { data: user, isLoading } = UseGetCurrentUser()
+
+  const navItems = [
+    {
+      title: "Dashboard",
+      href: "/admin",
+      icon: LayoutDashboard,
+    },
+    {
+      title: "Employees",
+      href: "/admin/employees",
+      icon: PersonStandingIcon,
+    },
+    {
+      title: "Attendance",
+      href: "/admin/attendance",
+      icon: CalendarCheck,
+    },
+    {
+      title: "Leave",
+      href: "/admin/leaves",
+      icon: ClipboardList,
+    },
+    {
+      title: "Payslips",
+      href: "/admin/payslips",
+      icon: Wallet,
+    },
+    {
+      title: "Settings",
+      href: "/admin/settings",
+      icon: Settings,
+    },
+  ]
 
   return (
     <Sidebar className="border-r border-white/10 bg-[#08101f] text-slate-300">
@@ -68,8 +77,12 @@ export function MainSidebar() {
 
       <SidebarContent className="bg-[#08101f] px-4 py-5">
         <div className="mb-6 rounded-xl bg-white/[0.05] p-3">
-          <p className="text-sm font-medium text-white">John Doe</p>
-          <p className="text-xs text-slate-500">Employee</p>
+          <p className="text-sm font-medium text-white">
+            {isLoading ? "Loading" : `Name : ${user.data.name}`}
+          </p>
+          <p className="text-xs text-slate-500">
+            {isLoading ? "Loading" : `Role : ${user.data.role}`}
+          </p>
         </div>
 
         <SidebarMenu>

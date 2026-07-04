@@ -39,7 +39,6 @@ export class EmployeesController {
   //POST /employees
   @Post()
   async createEmploye(@Body() employeeInput: EmployeesDto) {
-    console.log(employeeInput.password);
     const data = await this.employeesService.createEmployee(employeeInput);
     return {
       message: 'Successfully create User and Employee',

@@ -123,15 +123,10 @@ export class EmployeesService {
     };
   }
 
-  async updateEmployee(employeeInput: UpdateEmployeeDto, userId: string) {
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
-    });
-    if (!user) throw new NotFoundException('User not found');
-
+  async updateEmployee(employeeInput: UpdateEmployeeDto, employeeId: string) {
     const updateEmployee = await this.prisma.employee.update({
       //undefined thi moi k thay doi trog db
-      where: { userId: user.id },
+      where: { id: employeeId },
       data: {
         position: employeeInput.position || undefined,
         joinDate: employeeInput.joinDate
@@ -145,24 +140,23 @@ export class EmployeesService {
     });
 
     await this.cacheManager.del('employee:all');
-    await this.cacheManager.del(`employee:id:${userId}`);
+    await this.cacheManager.del(`employee:id:${employeeId}`);
 
     return {
       updateEmployee,
     };
   }
 
-  async deleteEmployee(userId: string) {
+  async deleteEmployee(employeeId: string) {
     const result = await this.prisma.$transaction(async (tx) => {
-      const user = await tx.user.findUnique({
-        where: { id: userId },
-      });
-      if (!user) throw new NotFoundException('User not found');
       const deletedEmployee = await tx.employee.delete({
-        where: { userId: user.id },
+        where: { id: employeeId },
+        include: {
+          user: true,
+        },
       });
       const deletedUser = await tx.user.delete({
-        where: { id: user.id },
+        where: { id: deletedEmployee.user.id },
         omit: {
           password: true,
         },
@@ -174,7 +168,7 @@ export class EmployeesService {
     });
 
     await this.cacheManager.del('employee:all');
-    await this.cacheManager.del(`employee:id:${userId}`);
+    await this.cacheManager.del(`employee:id:${employeeId}`);
 
     return {
       result,
