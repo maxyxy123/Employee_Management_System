@@ -30,7 +30,12 @@ export class DepartmentsService {
       return cacheDepartments;
     }
 
-    const departments = await this.prisma.department.findMany();
+    const departments = await this.prisma.department.findMany({
+      select: {
+        id: true,
+        name: true,
+      },
+    });
 
     await this.cacheManager.set(cache_key, departments);
 
