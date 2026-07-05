@@ -87,6 +87,10 @@ export class EmployeesService {
         throw new ConflictException('Email is already registered');
       }
 
+      const department = await tx.department.findUnique({
+        where: { id: employeeInput.departmentId },
+      });
+
       // Tạo user
       const createdUser = await tx.user.create({
         data: {
@@ -106,6 +110,11 @@ export class EmployeesService {
           user: {
             connect: {
               id: createdUser.id,
+            },
+          },
+          department: {
+            connect: {
+              id: department?.id,
             },
           },
         },

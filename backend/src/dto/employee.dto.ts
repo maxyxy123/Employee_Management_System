@@ -24,7 +24,8 @@ export class EmployeesDto {
   @IsString()
   employeeCode: string;
   @IsOptional()
-  @IsString()
+  @Type(() => Number)
+  @IsNumber()
   phone: string;
   @IsString()
   position: string;

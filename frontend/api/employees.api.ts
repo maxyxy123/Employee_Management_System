@@ -1,5 +1,8 @@
 import { api } from "./axios.api"
-import { CreateEmployeeType , UpdateEmployeeType } from "@/schema/employee.schema"
+import {
+  CreateEmployeeType,
+  UpdateEmployeeType,
+} from "@/schema/employee.schema"
 export const getAllEmployees = async () => {
   const res = await api.get("/employees")
   return res.data
@@ -15,7 +18,10 @@ export const createEmployee = async (employeeInput: CreateEmployeeType) => {
   return res.data
 }
 
-export const updateEmployee = async (employeeId: string,employeeInputUpdate: UpdateEmployeeType) => {
+export const updateEmployee = async (
+  employeeId: string,
+  employeeInputUpdate: UpdateEmployeeType
+) => {
   const res = await api.put(`/employees/${employeeId}`, employeeInputUpdate)
   return res.data
 }

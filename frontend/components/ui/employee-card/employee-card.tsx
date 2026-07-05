@@ -1,3 +1,5 @@
+
+
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "../badge"
 
@@ -18,8 +20,8 @@ export function EmployeeCard({
     .join("")
 
   return (
-    <Card className="overflow-hidden rounded-xl border bg-white transition hover:shadow-md">
-      <div className="relative flex h-36 items-center justify-center bg-slate-50">
+    <Card className="overflow-hidden rounded-xl border  hover:shadow-md">
+      <div className="relative flex h-36 items-center justify-center ">
         <Badge variant="secondary" className="absolute top-3 left-3">
           {department} 
         </Badge>

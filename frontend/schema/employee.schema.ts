@@ -8,10 +8,11 @@ export const CreateEmployeeSchema = z.object({
 
   //Employee
   employeeCode: z.string(),
-  phone: z.number().optional(),
+  phone: z.coerce.number().optional(),
   position: z.string(),
-  joinDate: z.date(),
-  salary: z.number().optional(),
+  joinDate: z.string().min(1, "Join date is required"),
+  departmentId : z.string(),
+  salary: z.coerce.number().min(0).optional(),
   avatar: z.string().optional(),
   address: z.string().optional(),
 })
@@ -21,8 +22,12 @@ export type CreateEmployeeType = z.infer<typeof CreateEmployeeSchema>
 export const UpdateEmployeeSchema = z.object({
   phone: z.number().optional(),
   position: z.string().optional(),
-  joinDate: z.date().optional(),
-  salary: z.number().optional(),
+  joinDate: z.coerce
+    .date({
+      error: "Join date is required",
+    })
+    .optional(),
+  salary: z.coerce.number().min(0).optional(),
   avatar: z.string().optional(),
   address: z.string().optional(),
 })
