@@ -32,4 +32,32 @@ export const UpdateEmployeeSchema = z.object({
   address: z.string().optional(),
 })
 
-export type UpdateEmployeeType = z.infer<typeof UpdateEmployeeSchema>
+
+
+
+
+export type UpdateEmployeeType = {
+  phone?: string
+  position?: string
+  joinDate?: string
+  salary?: number
+  avatar?: string
+  address?: string
+  departmentId ?:string
+}
+
+export type UpdateEmployeeFormProps = {
+  employee: {
+    id: string
+    phone?: string | null
+    position: string
+    joinDate: string
+    salary?: number | null
+    avatar?: string | null
+    address?: string | null
+    department: {
+      id :string 
+    } | null
+  }
+  onSuccess?: () => void
+}

@@ -7,6 +7,7 @@ import { UseGetAdminDashboard } from "@/hooks/dashboard/use-getAdminDashboard"
 import { AppLoading } from "@/components/shared/loading"
 export default function AdminDashboardPage() {
   const { data:admin, isLoading } = UseGetAdminDashboard()
+console.log(admin);
 
 
    if (isLoading) {
@@ -40,16 +41,16 @@ export default function AdminDashboardPage() {
 
 
   return (
-    <div className="min-h-screen bg-[#f8fafc]">
+    <div className="min-h-screen bg-background text-foreground">
       <div className="space-y-8">
         {/* Header */}
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-            Dashboard
-          </h1>
+          <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
 
-          <p className="mt-1 text-sm text-slate-500">
-            Welcome back, Admin — here&apos;s your overview
+          <p className="mt-1 text-sm">
+            Welcome back,{" "}
+            <span className="font-extrabold">{admin.data.admin.name}</span> —
+            here&apos;s your overview
           </p>
         </div>
 
@@ -61,22 +62,18 @@ export default function AdminDashboardPage() {
             return (
               <Card
                 key={item.title}
-                className="relative overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm"
+                className="relative overflow-hidden rounded-lg border border-slate-200 shadow-sm"
               >
-                <div className="absolute top-0 left-0 h-full w-1 bg-slate-400" />
+                <div className="absolute top-0 left-0 h-full w-1" />
 
                 <CardContent className="flex items-center justify-between p-6">
                   <div>
-                    <p className="text-sm font-semibold text-slate-700">
-                      {item.title}
-                    </p>
+                    <p className="text-sm font-semibold">{item.title}</p>
 
-                    <p className="mt-3 text-2xl font-bold text-slate-950">
-                      {item.value}
-                    </p>
+                    <p className="mt-3 text-2xl font-bold">{item.value}</p>
                   </div>
 
-                  <div className="flex size-12 items-center justify-center rounded-lg text-slate-500">
+                  <div className="flex size-12 items-center justify-center rounded-lg">
                     <Icon className="size-8 stroke-[1.8]" />
                   </div>
                 </CardContent>

@@ -145,6 +145,10 @@ export class EmployeesService {
         avatar: employeeInput.avatar || undefined,
         salary: employeeInput.salary || undefined,
         phone: employeeInput.phone || undefined,
+        departmentId: employeeInput.departmentId || undefined,
+      },
+      include: {
+        department: true,
       },
     });
 

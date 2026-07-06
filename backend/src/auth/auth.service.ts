@@ -232,6 +232,9 @@ export class AuthService {
 
     const user = await this.prisma.user.findUnique({
       where: { id: payload.sub },
+      omit: {
+        password: true,
+      },
       include: {
         employee: {
           select: {

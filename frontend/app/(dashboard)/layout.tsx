@@ -16,11 +16,13 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         } as CSSProperties
       }
     >
-      <div className="flex min-h-screen w-full bg-slate-950">
+      <div className="flex min-h-screen w-full">
         <MainSidebar />
 
         <SidebarInset className="bg-slate-50">
-          <main className="min-h-screen p-6">{children}</main>
+          <main className="min-h-screen bg-background p-6 text-foreground">
+            {children}
+          </main>
         </SidebarInset>
       </div>
     </SidebarProvider>

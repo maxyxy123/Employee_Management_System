@@ -17,24 +17,46 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { Search, Plus } from "lucide-react"
+import { Search, Plus, Building2 } from "lucide-react"
 import { EmployeeCard } from "@/components/ui/employee-card/employee-card"
 import { UseGetAllEmployee } from "@/hooks/employees/use-getAllEmployee"
 import { AppLoading } from "@/components/shared/loading"
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { CreateEmployeeForm } from "@/components/ui/create-employee-form/employee-form"
 import { UseGetAllDepartment } from "@/hooks/departments/use-getAllDepartments"
 export default function EmployeesPage() {
   const [open, isOpen] = useState<boolean>(false)
+  const [selectedDepartmentId, setSelectedDepartmentId] = useState("all")
+
+  //hooks
   const { data: employees, isLoading: isLoadingEmployees } = UseGetAllEmployee()
   console.log(employees)
-
   const { data: departments, isLoading: isLoadingDepartments } =
     UseGetAllDepartment()
-  console.log(departments)
+  
+  //filltered
+  const filteredEmployees = useMemo(() => {
+    if (selectedDepartmentId === "all") {
+      return employees?.data
+    }
+
+    return employees.data.filter(
+      (employee: {
+        id: string
+        user: { name: string }
+        position: string
+        departmentId: string
+        department: {
+          name: string
+        }
+      }) => employee.departmentId === selectedDepartmentId
+    )
+  }, [employees?.data, selectedDepartmentId])
+
+
 
   if (isLoadingDepartments || isLoadingEmployees) {
-    return <AppLoading /> 
+    return <AppLoading />
   }
 
   return (
@@ -42,7 +64,7 @@ export default function EmployeesPage() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-3xl font-extrabold text-black">Employees</h1>
+          <h1 className="text-3xl font-extrabold">Employees</h1>
           <p className="text-sm text-muted-foreground">
             Manage your team members
           </p>
@@ -64,7 +86,7 @@ export default function EmployeesPage() {
             </DialogDescription>
           </DialogHeader>
 
-          <CreateEmployeeForm departments = {departments} />
+          <CreateEmployeeForm departments={departments ?? []} />
         </DialogContent>
       </Dialog>
 
@@ -79,31 +101,57 @@ export default function EmployeesPage() {
           />
         </div>
 
-        <Select defaultValue="all">
-          <SelectTrigger className="w-52">
-            <SelectValue />
+        {/* render department   */}
+        <Select
+          defaultValue="all"
+          value={selectedDepartmentId}
+          onValueChange={setSelectedDepartmentId}
+        >
+          <SelectTrigger className="h-10 w-full rounded-xl border bg-background px-3 shadow-sm transition-all hover:bg-muted/40 focus:ring-2 focus:ring-primary/20 sm:w-60">
+            <div className="flex items-center gap-2">
+              <Building2 className="size-4 text-muted-foreground" />
+
+              <SelectValue placeholder="Select department" />
+            </div>
           </SelectTrigger>
 
-          <SelectContent>
-            <SelectItem value="all">All Departments</SelectItem>
-            <SelectItem value="engineering">Engineering</SelectItem>
-            <SelectItem value="support">IT Support</SelectItem>
+          <SelectContent className="rounded-xl p-1 shadow-lg">
+            <SelectItem
+              value="all"
+              className="cursor-pointer rounded-lg font-medium"
+            >
+              All departments
+            </SelectItem>
+
+            {departments.data.map(
+              (department: { id: string; name: string }) => (
+                <SelectItem
+                  key={department.id}
+                  value={department.id}
+                  className="cursor-pointer rounded-lg"
+                >
+                  {department.name}
+                </SelectItem>
+              )
+            )}
           </SelectContent>
         </Select>
       </div>
 
       {/* Cards */}
       <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {employees.data.map((employee) => {
-          return (
-            <EmployeeCard
-              key={employee.id}
-              name={employee.user.name}
-              position={employee.position}
-              department={employee.department?.name ?? "Dont have"}
-            />
-          )
-        })}
+        {filteredEmployees.map(
+          (employee: {
+            id: string
+            user: { name: string }
+            position: string
+            department: {
+              name: string
+            }
+          }) => {
+            return <EmployeeCard key={employee.id} employee={employee} />
+          }
+        )}
       </div>
     </div>
   )
