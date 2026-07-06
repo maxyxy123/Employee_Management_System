@@ -67,6 +67,9 @@ export class UpdateEmployeeDto {
   @IsOptional()
   @IsString()
   address: string;
+  @IsOptional()
+  @IsString()
+  departmentId: string;
 }
 
 export type EmployeeTypeForCache = Prisma.EmployeeGetPayload<{

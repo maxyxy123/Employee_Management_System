@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label"
 import { useForm } from "react-hook-form"
 import { LoginSchema, LoginSchemaType } from "@/schema/auth.schema"
 import { zodResolver } from "@hookform/resolvers/zod"
-
+import { toast } from "sonner"
 import { UseLogin } from "@/hooks/auth/use-login"
 
 export default function LoginPage() {
@@ -27,7 +27,14 @@ export default function LoginPage() {
   })
 
   const onSubmit = async (loginInput: LoginSchemaType) => {
- loginMutation.mutate(loginInput)
+    loginMutation.mutate(loginInput, {
+      onSuccess: () => {
+        toast.success("Successfully Logging In")
+      },
+      onError: () => {
+        toast.error("Failed to Login")
+      },
+    })
   }
 
   return (
@@ -35,14 +42,14 @@ export default function LoginPage() {
       <section className="grid min-h-dvh w-full bg-white md:grid-cols-2">
         {/* Left panel */}
         <div className="hidden bg-[#211D52] px-14 md:flex md:flex-col md:justify-center">
-          <div className="max-w-[430px]">
+          <div className="max-w-107.5">
             <h1 className="text-4xl leading-tight font-semibold tracking-[-0.04em] text-white">
               Employee
               <br />
               Management System
             </h1>
 
-            <p className="mt-6 max-w-[360px] text-sm leading-6 text-white/65">
+            <p className="mt-6 max-w-90 text-sm leading-6 text-white/65">
               Streamline your workforce operations, track attendance, manage
               payroll, and empower your team securely.
             </p>
@@ -51,7 +58,7 @@ export default function LoginPage() {
 
         {/* Right panel */}
         <div className="flex items-center justify-center px-6 py-10">
-          <div className="w-full max-w-[385px]">
+          <div className="w-full max-w-96.25">
             <div>
               <h2 className="text-2xl font-semibold tracking-[-0.03em] text-slate-950">
                 Employee Portal

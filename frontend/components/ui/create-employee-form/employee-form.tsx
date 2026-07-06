@@ -19,13 +19,13 @@ import {
   SelectItem,
   SelectValue,
 } from "../select"
-import { useState } from "react"
+import {toast} from 'sonner'
 type CreateEmployeeInput = z.input<typeof CreateEmployeeSchema>
 type CreateEmployeeOutput = z.output<typeof CreateEmployeeSchema>
 
 export function CreateEmployeeForm({ departments }) {
   const createEmployeeMutation = UseCreateEmployee()
-  const [departmentId, setDepartmentId] = useState<string>("")
+
   const {
     register,
     handleSubmit,
@@ -38,7 +38,7 @@ export function CreateEmployeeForm({ departments }) {
       name: "",
       email: "",
       password: "",
-      departmentId : '',
+      departmentId: "",
       employeeCode: "",
       position: "",
       avatar: "",
@@ -46,8 +46,15 @@ export function CreateEmployeeForm({ departments }) {
     },
   })
   const onSubmit = async (data: CreateEmployeeType) => {
-    console.log(data)
-    createEmployeeMutation.mutate(data)
+    createEmployeeMutation.mutate(data, {
+      onSuccess: () => {
+        toast.success("Create employee successfully")
+      },
+      onError: () => {
+        toast.error("Failed to create employee")
+      }
+   })
+    
   }
 
   return (

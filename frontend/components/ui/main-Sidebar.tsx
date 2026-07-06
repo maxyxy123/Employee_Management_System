@@ -76,7 +76,7 @@ export function MainSidebar() {
       </SidebarHeader>
 
       <SidebarContent className="bg-[#08101f] px-4 py-5">
-        <div className="mb-6 rounded-xl bg-white/[0.05] p-3">
+        <div className="mb-6 rounded-xl bg-white/5 p-3">
           <p className="text-sm font-medium text-white">
             {isLoading ? "Loading" : `Name : ${user.data.name}`}
           </p>
@@ -98,7 +98,7 @@ export function MainSidebar() {
                 <SidebarMenuButton
                   asChild
                   isActive={active}
-                  className="h-11 rounded-lg px-3 text-slate-400 hover:bg-white/[0.06] hover:text-white data-[active=true]:bg-[#22245f] data-[active=true]:text-white"
+                  className="h-11 rounded-lg px-3 text-slate-400 hover:bg-white/6 hover:text-white data-[active=true]:bg-[#22245f] data-[active=true]:text-white"
                 >
                   <Link href={item.href} className="flex items-center gap-3">
                     <Icon className="size-4" />
@@ -116,7 +116,7 @@ export function MainSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
-              className="h-11 rounded-lg px-3 text-slate-400 hover:bg-white/[0.06] hover:text-white"
+              className="h-11 rounded-lg px-3 text-slate-400 hover:bg-white/6 hover:text-white"
             >
               <Link href="/login" className="flex items-center gap-3">
                 <LogOut className="size-4" />
