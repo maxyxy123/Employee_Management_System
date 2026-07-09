@@ -166,6 +166,7 @@ export class EmployeesService {
         where: { id: employeeId },
         include: {
           user: true,
+          leaves: true,
         },
       });
       const deletedUser = await tx.user.delete({

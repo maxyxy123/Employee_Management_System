@@ -51,7 +51,7 @@ export class LeavesController {
   }
 
   @Post()
-  @Roles(Role.EMPLOYEE)
+  @Roles(Role.Admin, Role.EMPLOYEE)
   async createLeave(@Body() leaveInput: createLeavesDto, @Req() req) {
     const userId = req.user.sub as string;
     const leave = await this.leavesService.createLeave(leaveInput, userId);

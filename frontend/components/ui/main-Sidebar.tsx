@@ -3,7 +3,6 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import {
-  CalendarCheck,
   ClipboardList,
   LayoutDashboard,
   LogOut,
@@ -23,11 +22,12 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import { UseGetCurrentUser } from "@/hooks/auth/use-getMe"
+import { AppLoading } from "../shared/loading"
 
 export function MainSidebar() {
   const pathname = usePathname()
 
-  const { data: user, isLoading } = UseGetCurrentUser()
+  const { data: user} = UseGetCurrentUser()
 
   const navItems = [
     {
@@ -39,11 +39,6 @@ export function MainSidebar() {
       title: "Employees",
       href: "/admin/employees",
       icon: PersonStandingIcon,
-    },
-    {
-      title: "Attendance",
-      href: "/admin/attendance",
-      icon: CalendarCheck,
     },
     {
       title: "Leave",
@@ -62,6 +57,8 @@ export function MainSidebar() {
     },
   ]
 
+
+
   return (
     <Sidebar className="border-r border-white/10 bg-[#08101f] text-slate-300">
       <SidebarHeader className="border-b border-white/10 bg-[#08101f] px-5 py-5">
@@ -78,10 +75,10 @@ export function MainSidebar() {
       <SidebarContent className="bg-[#08101f] px-4 py-5">
         <div className="mb-6 rounded-xl bg-white/5 p-3">
           <p className="text-sm font-medium text-white">
-            {isLoading ? "Loading" : `Name : ${user.data.name}`}
+            {user ? `Name : ${user.data.name}` : "Loading"}
           </p>
           <p className="text-xs text-slate-500">
-            {isLoading ? "Loading" : `Role : ${user.data.role}`}
+            {user ? `Role : ${user.data.role}` : "Loading"}
           </p>
         </div>
 

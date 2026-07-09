@@ -41,11 +41,6 @@ export function AppSidebar() {
       icon: LayoutDashboard,
     },
     {
-      title: "Attendance",
-      href: "/admin/attendance",
-      icon: CalendarCheck,
-    },
-    {
       title: "Leave",
       href: "/admin/leaves",
       icon: ClipboardList,
