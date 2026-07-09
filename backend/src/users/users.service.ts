@@ -170,4 +170,16 @@ export class UsersService {
       updatePasswordForUser,
     };
   }
+
+  // async register(input: { name: string; email: string; password: string }) {
+  //   const hashPassword = await bcrypt.hash(input.password, 10);
+  //   const registered = await this.prisma.user.create({
+  //     data: {
+  //       name: input.name,
+  //       email: input.email,
+  //       password: hashPassword,
+  //     },
+  //   });
+  //   return registered;
+  // }
 }

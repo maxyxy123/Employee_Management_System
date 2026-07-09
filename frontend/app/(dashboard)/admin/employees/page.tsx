@@ -140,7 +140,7 @@ export default function EmployeesPage() {
 
       {/* Cards */}
       <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {filteredEmployees.map(
+        {filteredEmployees && filteredEmployees.map(
           (employee: {
             id: string
             user: { name: string }

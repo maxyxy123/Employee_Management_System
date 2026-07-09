@@ -31,7 +31,15 @@ export class LeavesService {
       return cacheLeaves;
     }
 
-    const leaves = await this.prisma.leave.findMany();
+    const leaves = await this.prisma.leave.findMany({
+      include: {
+        employee: {
+          select: {
+            user: true,
+          },
+        },
+      },
+    });
 
     await this.cacheManager.set(cache_Key, leaves);
     return leaves;
@@ -113,15 +121,15 @@ export class LeavesService {
   }
 
   async createLeave(leaveInput: createLeavesDto, userId: string) {
-    const employee = await this.prisma.employee.findUnique({
+    const existemployee = await this.prisma.employee.findUnique({
       where: { userId: userId },
     });
 
-    if (!employee) throw new NotFoundException('Employee not found');
+    if (!existemployee) throw new NotFoundException('Employee not found');
 
     const leave = await this.prisma.leave.create({
       data: {
-        employeeId: employee.id,
+        employeeId: existemployee.id,
         leaveType: leaveInput.leaveType,
         startDate: leaveInput.startDate,
         endDate: leaveInput.endDate,

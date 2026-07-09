@@ -1,19 +1,35 @@
 "use client"
 
-import { Building2, CalendarDays, FileText, UsersRound } from "lucide-react"
+import {
+  Building2,
+  CalendarDays,
+  Divide,
+  FileText,
+  UsersRound,
+} from "lucide-react"
 
 import { Card, CardContent } from "@/components/ui/card"
 import { UseGetAdminDashboard } from "@/hooks/dashboard/use-getAdminDashboard"
 import { AppLoading } from "@/components/shared/loading"
 export default function AdminDashboardPage() {
-  const { data:admin, isLoading } = UseGetAdminDashboard()
-console.log(admin);
+  const { data: admin, isLoading , isError } = UseGetAdminDashboard()
+  console.log(admin)
 
-
-   if (isLoading) {
-     return <AppLoading />
+  if (isLoading) {
+    return <AppLoading />
   }
-  
+  if (isError) {
+      return <div>Something went wrong</div>
+  }
+
+  if (!admin) {
+    return (
+      <div className="rounded-lg border p-4">
+        <h2 className="font-semibold">Employees profile not found</h2>
+      </div>
+    )
+  }
+
   const dashboardStats = [
     {
       title: "Total Employees",
@@ -36,8 +52,6 @@ console.log(admin);
       icon: FileText,
     },
   ]
-
- 
 
 
   return (

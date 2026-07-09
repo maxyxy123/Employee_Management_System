@@ -7,6 +7,7 @@ import {
 } from 'src/dto/user.dto';
 import { Roles } from 'src/decorators/role.decorator';
 import { Role } from 'src/enum/role.enum';
+// import { Public } from 'src/decorators/public.decorator';
 
 @Roles(Role.Admin)
 @Controller('users')
@@ -63,4 +64,10 @@ export class UsersController {
       data: data.updatePasswordForUser,
     };
   }
+
+  // @Post('register')
+  // @Public()
+  // register(@Body() input: { name: string; email: string; password: string }) {
+  //   return this.usersService.register(input);
+  // }
 }
