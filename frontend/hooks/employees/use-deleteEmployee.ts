@@ -12,6 +12,6 @@ export const UseDeleteEmployee = () => {
             queryClient.invalidateQueries({
               queryKey: ["allEmployee"],
             })
-        }
+        },
     })
 }

@@ -1,5 +1,6 @@
 export type Leave = {
-  id: string
+  id : string;
+  employeeId : string
   employee: {
     user: {
       name: string

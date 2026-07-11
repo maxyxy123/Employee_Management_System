@@ -6,8 +6,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
@@ -79,6 +77,7 @@ export const columns: ColumnDef<Leave>[] = [
     header: "ACTION",
     id: "action",
     cell: ({ row }) => {
+      const employeeId = row.original.employeeId
       const leaveId = row.original.id
       return (
         <DropdownMenu>
@@ -89,13 +88,12 @@ export const columns: ColumnDef<Leave>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem>Copy payment ID</DropdownMenuItem>
-            <DropdownMenuSeparator />
+            <DropdownMenuItem>
+              <Link href={`/admin/employees/${employeeId}`}>View employee details</Link>
+            </DropdownMenuItem>
             <DropdownMenuItem>
               <Link href={`/admin/leaves/${leaveId}`}>View leave details</Link>
             </DropdownMenuItem>
-            <DropdownMenuItem>View payment details</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       )

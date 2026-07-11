@@ -18,7 +18,7 @@ export class DashboardController {
   }
 
   @Get('employee')
-  @Roles(Role.EMPLOYEE)
+  @Roles(Role.EMPLOYEE, Role.Admin)
   async getDashboardEmployee(@Req() req) {
     const data = await this.dashboardService.getDashboardEmployee(req.user.sub);
     return {
