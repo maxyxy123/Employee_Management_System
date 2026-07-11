@@ -47,27 +47,65 @@ export class EmployeesService {
   }
 
   async getOneEmployee(employeeId: string) {
-    const cached_key = `employee:id:${employeeId}`;
-    const cachedEmployee = await this.cacheManager.get(cached_key);
+    const [employee, allLeaves, totalLeaves, pendingLeaves, approvedLeaves] =
+      await Promise.all([
+        this.prisma.employee.findUnique({
+          where: {
+            id: employeeId,
+          },
+          include: {
+            user: {
+              omit: {
+                password: true,
+              },
+            },
+            department: true,
+          },
+        }),
 
-    if (cachedEmployee !== undefined && cachedEmployee !== null) {
-      return cachedEmployee;
+        this.prisma.leave.findMany({
+          where: {
+            employeeId,
+          },
+          orderBy: {
+            startDate: 'desc',
+          },
+        }),
+        this.prisma.leave.count({
+          where: {
+            employeeId,
+          },
+        }),
+
+        this.prisma.leave.count({
+          where: {
+            employeeId,
+            status: 'PENDING',
+          },
+        }),
+
+        this.prisma.leave.count({
+          where: {
+            employeeId,
+            status: 'APPROVED',
+          },
+        }),
+      ]);
+
+    if (!employee) {
+      throw new NotFoundException('Employee not found');
     }
-    //findUnique ko tim thay return null
-    const employee = await this.prisma.employee.findUnique({
-      where: { id: employeeId },
-      include: {
-        user: true,
-        department: true,
-        leaves: true,
+
+    return {
+      ...employee,
+
+      leaveStats: {
+        allLeaves,
+        totalLeaves,
+        pendingLeaves,
+        approvedLeaves,
       },
-    });
-
-    if (!employee) throw new NotFoundException('Employee not found');
-
-    await this.cacheManager.set(cached_key, employee);
-
-    return employee;
+    };
   }
 
   async createEmployee(employeeInput: EmployeesDto) {
