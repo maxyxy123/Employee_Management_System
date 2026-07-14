@@ -5,6 +5,7 @@ import { UseGetOneEmployee } from "@/hooks/employees/use-getOneEmployee"
 import { AppLoading } from "@/components/shared/loading"
 import { AppError } from "@/components/shared/error"
 import { convertDate } from "@/lib/utils"
+
 type EmployeeIdProps = {
   employeeId: string
 }
@@ -16,6 +17,7 @@ export function EmployeeDetails({ employeeId }: EmployeeIdProps) {
     isLoading,
     isError,
     error,
+
   } = UseGetOneEmployee(employeeId)
   if (isLoading) {
     return <AppLoading />
@@ -33,6 +35,7 @@ export function EmployeeDetails({ employeeId }: EmployeeIdProps) {
       />
     )
   }
+  
   console.log("Get one employee", employeeInput.data)
 
   const employee = {

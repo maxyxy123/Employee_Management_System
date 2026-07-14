@@ -98,6 +98,11 @@ export class LeavesService {
                   status: true,
                 },
               },
+              department: {
+                select: {
+                  name: true,
+                },
+              },
             },
           },
         },
