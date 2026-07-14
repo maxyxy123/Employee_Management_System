@@ -10,12 +10,17 @@ export const UseUpdateEmployee = () => {
       employeeId: string
       employeeInputUpdate: UpdateEmployeeType
     }) => {
-      return updateEmployee(variable.employeeId , variable.employeeInputUpdate)
+      return updateEmployee(variable.employeeId, variable.employeeInputUpdate)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["allEmployee"],
       })
-    },
-  })
+    },   
+  }) 
 }
+
+
+
+
+
