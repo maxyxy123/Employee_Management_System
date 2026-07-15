@@ -239,6 +239,7 @@ export class AuthService {
         employee: {
           select: {
             avatar: true,
+            id: true,
             user: {
               select: {
                 id: true,

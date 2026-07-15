@@ -22,7 +22,6 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import { UseGetCurrentUser } from "@/hooks/auth/use-getMe"
-import { AppLoading } from "../shared/loading"
 
 export function MainSidebar() {
   const pathname = usePathname()

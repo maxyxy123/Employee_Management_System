@@ -1,11 +1,13 @@
 import {
   BadRequestException,
+  ConflictException,
   Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import {
+  NewProfileInputType,
   UpdatePasswordDto,
   UpdateRoleDto,
   UpdateStatusDto,
@@ -13,6 +15,7 @@ import {
 } from 'src/dto/user.dto';
 import bcrypt from 'bcrypt';
 import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
+
 @Injectable()
 export class UsersService {
   constructor(
@@ -145,8 +148,16 @@ export class UsersService {
       where: { id: userId },
     });
     if (!user) throw new NotFoundException('User not found');
+    const isHashOldPasswordValid = await bcrypt.compare(
+      updatePassword.currentPassword,
+      user.password,
+    );
 
-    const hashPassword = await bcrypt.hash(updatePassword.password, 12);
+    if (!isHashOldPasswordValid) {
+      throw new ConflictException('Password is not match');
+    }
+
+    const hashPassword = await bcrypt.hash(updatePassword.newPassword, 12);
 
     const updatePasswordForUser = await this.prisma.user.update({
       where: { id: userId },
@@ -182,4 +193,46 @@ export class UsersService {
   //   });
   //   return registered;
   // }
+
+  async updateUserProfile(
+    userId: string,
+    newProfileInput: NewProfileInputType,
+  ) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+    if (!user) throw new NotFoundException('User not found');
+
+    const employee = await this.prisma.employee.findUnique({
+      where: { userId: user.id },
+    });
+
+    if (!employee) throw new NotFoundException('Employee not found');
+
+    const updatedUserProfile = await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        name: newProfileInput.name ?? undefined,
+        email: newProfileInput.email ?? undefined,
+        employee: {
+          update: { position: newProfileInput.position ?? undefined },
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        employee: {
+          select: {
+            id: true,
+            position: true,
+          },
+        },
+      },
+    });
+
+    return {
+      updatedUserProfile,
+    };
+  }
 }

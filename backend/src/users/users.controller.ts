@@ -1,6 +1,8 @@
-import { Body, Controller, Get, Param, Put } from '@nestjs/common';
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+import { Body, Controller, Get, Param, Put, Req } from '@nestjs/common';
 import { UsersService } from './users.service';
 import {
+  NewProfileInputType,
   UpdatePasswordDto,
   UpdateRoleDto,
   UpdateStatusDto,
@@ -53,15 +55,29 @@ export class UsersController {
     };
   }
 
-  @Put(':id/password')
-  async updatePassword(
-    @Param('id') id: string,
-    @Body() updatePassword: UpdatePasswordDto,
-  ) {
+  @Put('me/change-password')
+  async updatePassword(@Req() req, @Body() updatePassword: UpdatePasswordDto) {
+    const id = req.user.sub as string;
     const data = await this.usersService.updatePassword(id, updatePassword);
     return {
       message: 'Successfully change Password',
       data: data.updatePasswordForUser,
+    };
+  }
+  @Roles(Role.Admin, Role.EMPLOYEE)
+  @Put('me/profile')
+  async updateUserProfile(
+    @Req() req,
+    @Body() newProfileInput: NewProfileInputType,
+  ) {
+    const userId = req.user.sub as string;
+    const data = await this.usersService.updateUserProfile(
+      userId,
+      newProfileInput,
+    );
+    return {
+      message: 'Successfully updated profile',
+      data: data.updatedUserProfile,
     };
   }
 
