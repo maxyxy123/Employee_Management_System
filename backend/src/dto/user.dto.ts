@@ -1,4 +1,11 @@
-import { IsEnum, IsNotEmpty, IsString, Length } from 'class-validator';
+import {
+  IsEmail,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Length,
+} from 'class-validator';
 import { Prisma } from 'src/generated/prisma/client';
 
 enum Role {
@@ -36,5 +43,20 @@ export class UpdateStatusDto {
 export class UpdatePasswordDto {
   @IsString()
   @Length(8, 20)
-  password: string;
+  currentPassword: string;
+  @IsString()
+  @Length(8, 20)
+  newPassword: string;
+}
+
+export class NewProfileInputType {
+  @IsOptional()
+  @IsString()
+  name: string;
+  @IsEmail()
+  @IsOptional()
+  email: string;
+  @IsString()
+  @IsOptional()
+  position: string;
 }

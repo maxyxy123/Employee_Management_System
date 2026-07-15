@@ -11,12 +11,12 @@ import { LoginSchema, LoginSchemaType } from "@/schema/auth.schema"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { toast } from "sonner"
 import { UseLogin } from "@/hooks/auth/use-login"
-
+import { useRouter } from "next/navigation"
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
 
   const loginMutation = UseLogin()
-
+  const router = useRouter()
   const {
     register,
     handleSubmit,
@@ -28,8 +28,14 @@ export default function LoginPage() {
 
   const onSubmit = async (loginInput: LoginSchemaType) => {
     loginMutation.mutate(loginInput, {
-      onSuccess: () => {
+      onSuccess: (data) => {
+        const user = data.user
         toast.success("Successfully Logging In")
+        if(user.role === "ADMIN"){
+          router.replace('/admin')
+        }else{
+          router.replace("/employee")
+        }
       },
       onError: () => {
         toast.error("Failed to Login")
