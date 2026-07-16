@@ -199,24 +199,73 @@ export class UsersService {
     newProfileInput: NewProfileInputType,
   ) {
     const user = await this.prisma.user.findUnique({
-      where: { id: userId },
+      where: {
+        id: userId,
+      },
+      select: {
+        id: true,
+        email: true,
+        employee: {
+          select: {
+            id: true,
+          },
+        },
+      },
     });
-    if (!user) throw new NotFoundException('User not found');
 
-    const employee = await this.prisma.employee.findUnique({
-      where: { userId: user.id },
-    });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
 
-    if (!employee) throw new NotFoundException('Employee not found');
+    if (!user.employee) {
+      throw new NotFoundException('Employee not found');
+    }
+
+    const normalizedEmail = newProfileInput.email?.trim().toLowerCase();
+
+    const normalizedName = newProfileInput.name?.trim().replace(/\s+/g, ' ');
+
+    const normalizedPosition = newProfileInput.position
+      ?.trim()
+      .replace(/\s+/g, ' ');
+
+    // Chỉ kiểm tra khi có email mới và email đó khác email hiện tại
+    if (normalizedEmail && normalizedEmail !== user.email.toLowerCase()) {
+      const existUserWithEmail = await this.prisma.user.findUnique({
+        where: {
+          email: normalizedEmail,
+        },
+        select: {
+          id: true,
+        },
+      });
+
+      // Email tồn tại và thuộc về user khác
+      if (existUserWithEmail && existUserWithEmail.id !== user.id) {
+        throw new ConflictException('Email is already registered');
+      }
+    }
 
     const updatedUserProfile = await this.prisma.user.update({
-      where: { id: user.id },
+      where: {
+        id: user.id,
+      },
       data: {
-        name: newProfileInput.name ?? undefined,
-        email: newProfileInput.email ?? undefined,
-        employee: {
-          update: { position: newProfileInput.position ?? undefined },
-        },
+        ...(normalizedName !== undefined && {
+          name: normalizedName,
+        }),
+
+        ...(normalizedEmail !== undefined && {
+          email: normalizedEmail,
+        }),
+
+        ...(normalizedPosition !== undefined && {
+          employee: {
+            update: {
+              position: normalizedPosition,
+            },
+          },
+        }),
       },
       select: {
         id: true,
