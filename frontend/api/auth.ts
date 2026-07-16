@@ -29,6 +29,6 @@ export const changePassword = async (passwordInput: PasswordInputType) => {
 }
 
 export const updateUserProfile = async (newProfileInput : NewProfileInputType) => {
-  const res = await api.put("/me/profile",newProfileInput)
+  const res = await api.put("users/me/profile",newProfileInput)
   return res.data
 }

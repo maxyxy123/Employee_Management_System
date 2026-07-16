@@ -5,31 +5,53 @@ import { ChangePasswordDialog } from "@/components/ui/settings/change-password-d
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-// import { UseUpdateUserProfile } from "@/hooks/auth/use-updateUserProfile"
-// import { UseGetCurrentUser } from "@/hooks/auth/use-getMe"
-// import { AppLoading } from "@/components/shared/loading"
-// import { AppError } from "@/components/shared/error"
-// import { NewProfileInputType } from "@/schema/auth.schema"
+import { UseUpdateUserProfile } from "@/hooks/auth/use-updateUserProfile"
+import { UseGetCurrentUser } from "@/hooks/auth/use-getMe"
+import { AppLoading } from "@/components/shared/loading"
+import {
+  NewProfileInputSchema,
+  NewProfileInputType,
+} from "@/schema/auth.schema"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { toast } from "sonner"
 export default function SettingsPage() {
-  // const {data :response,isLoading} = UseGetCurrentUser()
-  // const employeeId = response?.data.employee.id
-  // console.log(employeeId);
-  
-  // if(isLoading){
-  //   return <AppLoading />
-  // }
-  
-  // if(!employeeId){
-  //   return <AppError title="No Current User" message="Cannot find currentUser"  />
-  // }
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<NewProfileInputType>({
+    resolver: zodResolver(NewProfileInputSchema),
+    mode: "onChange",
+  })
 
-  
-  // const UpdateUserProfileMutation = UseUpdateUserProfile(employeeId)
+  const { data: response, isLoading } = UseGetCurrentUser()
 
-  // function handleSubmit(data: NewProfileInputType){
+  const employeeId = response?.data?.employee?.id ?? ""
 
-  // }
+  const UpdateUserProfileMutation = UseUpdateUserProfile(employeeId)
 
+  if (isLoading) {
+    return <AppLoading />
+  }
+
+  if (!response.data) {
+    return <div>User not found</div>
+  }
+  console.log("EmployeeId :", employeeId)
+
+  const onsubmit = async (data: NewProfileInputType) => {
+    console.log("Data form", data)
+
+    return UpdateUserProfileMutation.mutateAsync(data, {
+      onSuccess: () => {
+        toast.success("Update Profile Successfully")
+      },
+      onError: () => {
+        toast.error("Failed to Update Your Profile")
+      },
+    })
+  }
 
   return (
     <main className="min-h-screen bg-background p-5 md:p-8">
@@ -53,7 +75,7 @@ export default function SettingsPage() {
             </h2>
           </div>
 
-          <form   className="mt-8 space-y-7">
+          <form onSubmit={handleSubmit(onsubmit)} className="mt-8 space-y-7">
             <div className="grid gap-6 md:grid-cols-2">
               <div className="space-y-2.5">
                 <Label htmlFor="name" className="text-base">
@@ -62,11 +84,12 @@ export default function SettingsPage() {
 
                 <Input
                   id="name"
-                  name="name"
-                  defaultValue="Admin"
+                  {...register("name")}
                   placeholder="Enter your name"
                   className="h-14 rounded-lg bg-muted/40"
                 />
+
+                {errors.name && errors.name.message}
               </div>
 
               <div className="space-y-2.5">
@@ -76,12 +99,12 @@ export default function SettingsPage() {
 
                 <Input
                   id="email"
-                  name="email"
                   type="email"
-                  defaultValue="admin@example.com"
+                  {...register("email")}
                   placeholder="Enter your email"
                   className="h-14 rounded-lg bg-muted/40"
                 />
+                {errors.email && errors.email.message}
               </div>
             </div>
 
@@ -92,19 +115,26 @@ export default function SettingsPage() {
 
               <Input
                 id="position"
-                name="position"
+                {...register("position")}
                 placeholder="Enter your position"
                 className="h-14 rounded-lg bg-muted/40"
               />
+              {errors.position && errors.position.message}
             </div>
 
             <div className="flex justify-end pt-2">
               <Button
                 type="submit"
                 className="h-14 gap-2 rounded-lg px-7 text-base shadow-md"
+                disabled={isSubmitting}
               >
-                <Save className="size-5" />
-                Save Changes
+                {!isSubmitting ? (
+                  <>
+                    <Save className="size-5" /> Save Changes{" "}
+                  </>
+                ) : (
+                  "is loading"
+                )}
               </Button>
             </div>
           </form>

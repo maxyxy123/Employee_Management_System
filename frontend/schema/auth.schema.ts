@@ -16,7 +16,18 @@ export type PasswordInputType = {
 
 export const NewProfileInputSchema = z.object({
   name : z.string().optional(),
-  email : z.email().optional(),
+ email: z.preprocess(
+  (value) => {
+    if (typeof value === "string" && value.trim() === "") {
+      return undefined
+    }
+
+    return value
+  },
+  z.email({
+    error: "Email không hợp lệ",
+  }).optional()
+),
   position : z.string().optional()
 })
 

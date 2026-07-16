@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
 import {
   IsEmail,
   IsEnum,
@@ -6,6 +7,7 @@ import {
   IsString,
   Length,
 } from 'class-validator';
+import { Transform } from 'class-transformer';
 import { Prisma } from 'src/generated/prisma/client';
 
 enum Role {
@@ -50,12 +52,29 @@ export class UpdatePasswordDto {
 }
 
 export class NewProfileInputType {
+  @Transform(({ value }) =>
+    typeof value === 'string' ? value.trim().replace(/\s+/g, '') : value,
+  )
   @IsOptional()
   @IsString()
   name: string;
+
+  @Transform(({ value }) => {
+    if (typeof value !== 'string') return value;
+
+    const trimValue = value.trim().replace(/\s+/g, ' ');
+    return trimValue === '' ? undefined : trimValue;
+  })
   @IsEmail()
   @IsOptional()
   email: string;
+
+  @Transform(({ value }) => {
+    if (typeof value !== 'string') return value;
+
+    const trimValue = value.trim().replace(/\s+/g, ' ');
+    return trimValue === '' ? undefined : trimValue;
+  })
   @IsString()
   @IsOptional()
   position: string;
