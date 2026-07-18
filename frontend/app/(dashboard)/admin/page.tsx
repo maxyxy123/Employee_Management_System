@@ -10,16 +10,19 @@ import {
 import { Card, CardContent } from "@/components/ui/card"
 import { UseGetAdminDashboard } from "@/hooks/dashboard/use-getAdminDashboard"
 import { AppLoading } from "@/components/shared/loading"
+import { UseGetCurrentUser } from "@/hooks/auth/use-getMe"
 export default function AdminDashboardPage() {
-  const { data: admin, isLoading , isError } = UseGetAdminDashboard()
-  console.log(admin)
-
-  if (isLoading) {
+  const { data: admin, isLoading: isLoadingAdmin , isError:isErrorAdmin } = UseGetAdminDashboard()
+  console.log("adminDashboard",admin)
+  const {data:currentUser,isLoading , isError} = UseGetCurrentUser()
+  if (isLoading ||isLoadingAdmin) {
     return <AppLoading />
   }
-  if (isError) {
+  if (isError || isErrorAdmin) {
       return <div>Something went wrong</div>
   }
+  console.log("current user : ",currentUser.data);
+  
 
   if (!admin) {
     return (
