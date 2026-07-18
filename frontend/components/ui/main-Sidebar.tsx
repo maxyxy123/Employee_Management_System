@@ -8,7 +8,6 @@ import {
   LogOut,
   Settings,
   User,
-  Wallet,
   PersonStandingIcon,
 } from "lucide-react"
 
@@ -26,37 +25,38 @@ import { UseGetCurrentUser } from "@/hooks/auth/use-getMe"
 export function MainSidebar() {
   const pathname = usePathname()
 
-  const { data: user} = UseGetCurrentUser()
+  const { data: user, isLoading } = UseGetCurrentUser()
+
+  if (isLoading) {
+    return <div>loading</div>
+  }
+  console.log("current User sidebar", user.data)
 
   const navItems = [
     {
       title: "Dashboard",
-      href: "/admin",
+      href: user.data.role === "ADMIN" ? "/admin" : "/employee",
       icon: LayoutDashboard,
     },
     {
-      title: "Employees",
-      href: "/admin/employees",
+      title: user.data.role === "ADMIN" ? "Employees" : "Profile",
+      href:
+        user.data.role === "ADMIN" ? "/admin/employees" : "/employee/details",
       icon: PersonStandingIcon,
     },
     {
       title: "Leave",
-      href: "/admin/leaves",
+      href: user.data.role === "ADMIN" ? "/admin/leaves" : "/employee/leaves",
       icon: ClipboardList,
     },
-    {
-      title: "Payslips",
-      href: "/admin/payslips",
-      icon: Wallet,
-    },
+
     {
       title: "Settings",
-      href: "/admin/settings",
+      href:
+        user.data.role === "ADMIN" ? "/admin/settings" : "/employee/settings",
       icon: Settings,
     },
   ]
-
-
 
   return (
     <Sidebar className="border-r border-white/10 bg-[#08101f] text-slate-300">
@@ -84,10 +84,13 @@ export function MainSidebar() {
         <SidebarMenu>
           {navItems.map((item) => {
             const Icon = item.icon
-            const active =
-              item.href === "/admin"
-                ? pathname === "/admin"
-                : pathname.startsWith(item.href)
+
+            const isDashboard =
+              item.href === "/admin" || item.href === "/employee"
+
+            const active = isDashboard
+              ? pathname === item.href
+              : pathname === item.href || pathname.startsWith(`${item.href}/`)
 
             return (
               <SidebarMenuItem key={item.href}>
